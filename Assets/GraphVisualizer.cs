@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using QuikGraph;
 using QuikGraph.Algorithms.Search;
+using UnityEngine.UI;
 
 public class GraphVisualizer : MonoBehaviour
 {
@@ -21,7 +22,8 @@ public class GraphVisualizer : MonoBehaviour
         // Create a graph
         var edges = new[] {new Edge<int>(0, 1), 
                            new Edge<int>(0, 2),
-                           new Edge<int>(1, 3)};
+                           new Edge<int>(1, 3),
+                           new Edge<int>(3, 4)};
         graph = edges.ToAdjacencyGraph<int, Edge<int>>();
     }
 
@@ -29,11 +31,41 @@ public class GraphVisualizer : MonoBehaviour
         // Calculate display bounds
         displayBounds = parentDisplay.sizeDelta;
 
-        DrawGraph(graph);
-        ArrangeGraph(graph);
+        // InitializeGraph(graph);
+        // ArrangeGraph(graph);
     }
 
-    void DrawGraph(AdjacencyGraph<int, Edge<int>> graph) {
+    void GraphToTree(AdjacencyGraph<int, Edge<int>> graph) {
+        Dictionary<int, Node> tree = new Dictionary<int, Node>();
+
+        var dfs = new DepthFirstSearchAlgorithm<int, Edge<int>>(graph);
+        dfs.TreeEdge += (Edge<int> edge) => {
+            int parentId = edge.Source;
+            int childId = edge.Target;
+
+            if (!tree.ContainsKey(parentId)) {
+                Node parentNode = new Node(parentId, 0);
+                tree.Add(parentId, new Node(parentId, 0));
+            }
+
+            Node childNode = new Node(childId, 0);
+        };
+        dfs.Compute();
+    }
+
+    class Node {
+        int id;
+        int depth;
+        public List<Node> children;
+
+        public Node(int _id, int _depth) {
+            id = _id;
+            depth = _depth;
+            children = new List<Node>();
+        }
+    }
+
+    void InitializeGraph(AdjacencyGraph<int, Edge<int>> graph) {
         vizGraph = new Dictionary<int, DrawnVertex>();
 
         foreach (var edge in graph.Edges) {
@@ -53,19 +85,41 @@ public class GraphVisualizer : MonoBehaviour
         }
     }
 
-    void ArrangeGraph(AdjacencyGraph<int, Edge<int>> graph) {
-        // Calculate vertex depth
+    // Get the maximum depth of the graph
+    int GetMaxDepth(AdjacencyGraph<int, Edge<int>> graph) {
+        int maxDepth = int.MinValue;
+
         var dfs = new DepthFirstSearchAlgorithm<int, Edge<int>>(graph);
+        Dictionary<int, int> vertexParents = new Dictionary<int, int>{{0, 0}};
         dfs.TreeEdge += (Edge<int> edge) => {
-            vizGraph[edge.Target].depth += vizGraph[edge.Source].depth + 1;
+            if (!vertexParents.ContainsKey(edge.Target)) {
+                vertexParents.Add(edge.Target, 0);
+            }
+
+            vertexParents[edge.Target] = 1 + vertexParents[edge.Source];
+
+            if (vertexParents[edge.Target] > maxDepth) {
+                maxDepth = vertexParents[edge.Target];
+            }
         };
         dfs.Compute();
 
-        foreach(KeyValuePair<int, DrawnVertex> kvp in vizGraph) {
-            DrawnVertex drawnVertex = kvp.Value;
-            drawnVertex.SetPosition(new Vector2(0, drawnVertex.depth * 100));
-        }
+        return maxDepth;
     }
+
+    // void ArrangeGraph(AdjacencyGraph<int, Edge<int>> graph) {
+    //     // Calculate vertex depth
+    //     var dfs = new DepthFirstSearchAlgorithm<int, Edge<int>>(graph);
+    //     dfs.TreeEdge += (Edge<int> edge) => {
+    //         vizGraph[edge.Target].depth += vizGraph[edge.Source].depth + 1;
+    //     };
+    //     dfs.Compute();
+
+    //     foreach(KeyValuePair<int, DrawnVertex> kvp in vizGraph) {
+    //         DrawnVertex drawnVertex = kvp.Value;
+    //         drawnVertex.SetPosition(new Vector2(0, drawnVertex.depth * 100));
+    //     }
+    // }
 
     Transform CreateVertex() {
         Vertex newVertex = Instantiate(vertexObject);
@@ -94,7 +148,10 @@ public class GraphVisualizer : MonoBehaviour
         public int depth;
         public Transform transform;
 
+        // UI components
         private RectTransform rectTransform;
+        private Button button;
+        private Text text;
 
         public DrawnVertex(int _id, int _depth, Transform _transform) {
             id = _id;
@@ -102,10 +159,15 @@ public class GraphVisualizer : MonoBehaviour
             transform = _transform;
 
             rectTransform = transform.GetComponent<RectTransform>();
+            button = transform.GetComponent<Button>();
+            text = transform.GetComponentInChildren<Text>();
+
+            button.onClick.AddListener(() => {Debug.Log("Click");});
         }
 
         public void SetPosition(Vector2 position) {
             rectTransform.anchoredPosition3D = new Vector3(position.x, position.y, 0);
+            text.text = "test";
         }
     }
 
