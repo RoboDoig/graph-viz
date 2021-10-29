@@ -54,12 +54,17 @@ public class GraphVisualizer : MonoBehaviour
     }
 
     void ArrangeGraph(AdjacencyGraph<int, Edge<int>> graph) {
+        // Calculate vertex depth
         var dfs = new DepthFirstSearchAlgorithm<int, Edge<int>>(graph);
         dfs.TreeEdge += (Edge<int> edge) => {
             vizGraph[edge.Target].depth += vizGraph[edge.Source].depth + 1;
-            Debug.Log(vizGraph[edge.Target].depth);
         };
         dfs.Compute();
+
+        foreach(KeyValuePair<int, DrawnVertex> kvp in vizGraph) {
+            DrawnVertex drawnVertex = kvp.Value;
+            drawnVertex.SetPosition(new Vector2(0, drawnVertex.depth * 100));
+        }
     }
 
     Transform CreateVertex() {
@@ -89,10 +94,22 @@ public class GraphVisualizer : MonoBehaviour
         public int depth;
         public Transform transform;
 
+        private RectTransform rectTransform;
+
         public DrawnVertex(int _id, int _depth, Transform _transform) {
             id = _id;
             depth = _depth;
             transform = _transform;
+
+            rectTransform = transform.GetComponent<RectTransform>();
         }
+
+        public void SetPosition(Vector2 position) {
+            rectTransform.anchoredPosition3D = new Vector3(position.x, position.y, 0);
+        }
+    }
+
+    class DrawnLine {
+
     }
 }
