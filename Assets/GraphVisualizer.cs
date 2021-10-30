@@ -16,6 +16,10 @@ public class GraphVisualizer : MonoBehaviour
     // graph definition
     private VisualizableGraph<int, Edge<int>> graph;
 
+    // graph data cache
+    Dictionary<int, DrawnVertex> drawnVertices = new Dictionary<int, DrawnVertex>();
+    List<DrawnEdge> drawnLines = new List<DrawnEdge>();
+
     void Awake() {
         // Create a graph
         var edges = new[] {new Edge<int>(0, 1), 
@@ -40,41 +44,42 @@ public class GraphVisualizer : MonoBehaviour
     }
 
     void DrawGraph() {
-        Dictionary<int, DrawnVertex> drawnVertices = new Dictionary<int, DrawnVertex>();
+        drawnVertices = new Dictionary<int, DrawnVertex>();
+
         foreach (var edge in graph.graph.Edges) {
             // Draw vertices
             if (!drawnVertices.ContainsKey(edge.Source)) {
                 Vector3 position = new Vector3(graph.nodeGraph[edge.Source].depthRank * 100, graph.nodeGraph[edge.Source].depth * 100, 0);
                 string displayText = graph.nodeGraph[edge.Source].id.ToString();
-                DrawnVertex newVertex = new DrawnVertex(CreateVertex(position, displayText));
+                DrawnVertex newVertex = CreateVertex(position, displayText);
                 drawnVertices.Add(edge.Source, newVertex);
             }
 
             if (!drawnVertices.ContainsKey(edge.Target)) {
                 Vector3 position = new Vector3(graph.nodeGraph[edge.Target].depthRank * 100, graph.nodeGraph[edge.Target].depth * 100, 0);
                 string displayText = graph.nodeGraph[edge.Target].id.ToString();
-                DrawnVertex newVertex = new DrawnVertex(CreateVertex(position, displayText));
+                DrawnVertex newVertex = CreateVertex(position, displayText);
                 drawnVertices.Add(edge.Target, newVertex);
             }
 
             // Draw edge
-            CreateEdge(drawnVertices[edge.Source].transform, drawnVertices[edge.Target].transform);
+            CreateEdge(drawnVertices[edge.Source], drawnVertices[edge.Target]);
         }
     }
 
-    Transform CreateVertex(Vector3 position, string displayText) {
+    DrawnVertex CreateVertex(Vector3 position, string displayText) {
         VertexObject newVertex = Instantiate(vertexObject, Vector3.zero, Quaternion.identity, parentDisplay);
         newVertex.SetPosition(position);
         newVertex.SetText(displayText);
 
-        return newVertex.transform;
+        return new DrawnVertex(newVertex.transform);
     }
 
-    Transform CreateEdge(Transform start, Transform end) {
+    DrawnEdge CreateEdge(DrawnVertex start, DrawnVertex end) {
         EdgeObject newEdge = Instantiate(edgeObject, Vector3.zero, Quaternion.identity, parentDisplay);
-        newEdge.DefinePoints(new Transform[] {start, end});
+        newEdge.DefinePoints(new Transform[] {start.transform, end.transform});
 
-        return newEdge.transform;
+        return new DrawnEdge(start, end);
     }
 
     class DrawnVertex {
@@ -82,6 +87,16 @@ public class GraphVisualizer : MonoBehaviour
 
         public DrawnVertex (Transform _transform) {
             transform = _transform;
+        }
+    }
+
+    class DrawnEdge {
+        public DrawnVertex source;
+        public DrawnVertex target;
+
+        public DrawnEdge (DrawnVertex _source, DrawnVertex _target) {
+            source = _source;
+            target = _target;
         }
     }
 }
