@@ -10,13 +10,15 @@ public class GraphVisualizer : MonoBehaviour
     public RectTransform parentDisplay;
     [SerializeField]
     private Vector2 displayBounds;
-    public Vertex vertexObject;
-    public EdgeLine lineObject;
+    public VertexObject vertexObject;
+    public EdgeObject edgeObject;
 
     // graph definition
-    private AdjacencyGraph<int, Edge<int>> graph;
-    // map vertices to transforms
-    private Dictionary<int, DrawnVertex> vizGraph = new Dictionary<int, DrawnVertex>();
+    private VisualizableGraph<int, Edge<int>> graph;
+
+    // graph data cache
+    Dictionary<int, DrawnVertex> drawnVertices = new Dictionary<int, DrawnVertex>();
+    List<DrawnEdge> drawnLines = new List<DrawnEdge>();
 
     void Awake() {
         // Create a graph
@@ -30,143 +32,71 @@ public class GraphVisualizer : MonoBehaviour
                            new Edge<int>(2, 7),
                            new Edge<int>(2, 8),
                            new Edge<int>(5, 9)};
-        graph = edges.ToAdjacencyGraph<int, Edge<int>>();
+                           
+        graph = new TreeGraph<int, Edge<int>>(edges);
     }
 
     void Start() {
         // Calculate display bounds
         displayBounds = parentDisplay.sizeDelta;
 
-        InitializeGraph(graph);
-        ArrangeGraph(graph);
+        DrawGraph();
     }
 
-    void InitializeGraph(AdjacencyGraph<int, Edge<int>> graph) {
-        vizGraph = new Dictionary<int, DrawnVertex>();
+    void DrawGraph() {
+        drawnVertices = new Dictionary<int, DrawnVertex>();
 
-        foreach (var edge in graph.Edges) {
-            // if source vertex hasn't been instantiated, create it
-            if (!vizGraph.ContainsKey(edge.Source)) {
-                DrawnVertex newVertex = new DrawnVertex(edge.Source, 0, 0, CreateVertex());
-                vizGraph.Add(edge.Source, newVertex);
+        foreach (var edge in graph.graph.Edges) {
+            // Draw vertices
+            if (!drawnVertices.ContainsKey(edge.Source)) {
+                Vector3 position = new Vector3(graph.nodeGraph[edge.Source].depthRank * 100, graph.nodeGraph[edge.Source].depth * 100, 0);
+                string displayText = graph.nodeGraph[edge.Source].id.ToString();
+                DrawnVertex newVertex = CreateVertex(position, displayText);
+                drawnVertices.Add(edge.Source, newVertex);
             }
 
-            // if the target vertex hasn't been isntantiated, instantiate it
-            if (!vizGraph.ContainsKey(edge.Target)) {
-                DrawnVertex newVertex = new DrawnVertex(edge.Target, 0, 0, CreateVertex());
-                vizGraph.Add(edge.Target, newVertex);
+            if (!drawnVertices.ContainsKey(edge.Target)) {
+                Vector3 position = new Vector3(graph.nodeGraph[edge.Target].depthRank * 100, graph.nodeGraph[edge.Target].depth * 100, 0);
+                string displayText = graph.nodeGraph[edge.Target].id.ToString();
+                DrawnVertex newVertex = CreateVertex(position, displayText);
+                drawnVertices.Add(edge.Target, newVertex);
             }
 
-            CreateLine(vizGraph[edge.Source].transform, vizGraph[edge.Target].transform);
+            // Draw edge
+            CreateEdge(drawnVertices[edge.Source], drawnVertices[edge.Target]);
         }
     }
 
-    void ArrangeGraph(AdjacencyGraph<int, Edge<int>> graph) {
-        // Calculate vertex depth
-        var dfs = new DepthFirstSearchAlgorithm<int, Edge<int>>(graph);
-        dfs.TreeEdge += (Edge<int> edge) => {
-            vizGraph[edge.Target].depth += vizGraph[edge.Source].depth + 1;
-        };
-        dfs.Compute();
+    DrawnVertex CreateVertex(Vector3 position, string displayText) {
+        VertexObject newVertex = Instantiate(vertexObject, Vector3.zero, Quaternion.identity, parentDisplay);
+        newVertex.SetPosition(position);
+        newVertex.SetText(displayText);
 
-        Dictionary<int, int> depthRanks = new Dictionary<int, int>();
-        // Calculate depth rank
-        var bfs = new DepthFirstSearchAlgorithm<int, Edge<int>>(graph);
-        bfs.DiscoverVertex += (int vertex) => {
-            if (!depthRanks.ContainsKey(vizGraph[vertex].depth)) {
-                depthRanks.Add(vizGraph[vertex].depth, 0);
-            }
-
-            vizGraph[vertex].depthRank = depthRanks[vizGraph[vertex].depth];
-            depthRanks[vizGraph[vertex].depth] += 1;
-        };
-        bfs.Compute();
-
-        foreach(var vertex in graph.Vertices) {
-            vizGraph[vertex].SetPosition(new Vector2(vizGraph[vertex].depthRank * 100, vizGraph[vertex].depth * 100));
-            vizGraph[vertex].SetText(vertex.ToString());
-        }
+        return new DrawnVertex(newVertex.transform);
     }
 
-    // Get the maximum depth of the graph
-    int GetMaxDepth(AdjacencyGraph<int, Edge<int>> graph) {
-        int maxDepth = int.MinValue;
+    DrawnEdge CreateEdge(DrawnVertex start, DrawnVertex end) {
+        EdgeObject newEdge = Instantiate(edgeObject, Vector3.zero, Quaternion.identity, parentDisplay);
+        newEdge.DefinePoints(new Transform[] {start.transform, end.transform});
 
-        var dfs = new DepthFirstSearchAlgorithm<int, Edge<int>>(graph);
-        Dictionary<int, int> vertexParents = new Dictionary<int, int>{{0, 0}};
-        dfs.TreeEdge += (Edge<int> edge) => {
-            if (!vertexParents.ContainsKey(edge.Target)) {
-                vertexParents.Add(edge.Target, 0);
-            }
-
-            vertexParents[edge.Target] = 1 + vertexParents[edge.Source];
-
-            if (vertexParents[edge.Target] > maxDepth) {
-                maxDepth = vertexParents[edge.Target];
-            }
-        };
-        dfs.Compute();
-
-        return maxDepth;
-    }
-
-    Transform CreateVertex() {
-        Vertex newVertex = Instantiate(vertexObject);
-        newVertex.transform.SetParent(parentDisplay);
-        newVertex.transform.localScale = Vector3.one;
-        newVertex.transform.position = Vector3.zero;
-        newVertex.transform.localRotation = Quaternion.identity;
-        newVertex.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, displayBounds.y/2, 0);
-
-        return newVertex.transform;
-    }
-
-    Transform CreateLine(Transform start, Transform end) {
-        EdgeLine newLine = Instantiate(lineObject);
-        newLine.transform.SetParent(parentDisplay);
-        newLine.transform.localScale = Vector3.one;
-        newLine.transform.position = Vector3.zero;
-        newLine.transform.localRotation = Quaternion.identity;
-        newLine.DefinePoints(new Transform[] {start, end});
-
-        return newLine.transform;
+        return new DrawnEdge(start, end);
     }
 
     class DrawnVertex {
-        public int id;
-        public int depth;
-        public int depthRank;
         public Transform transform;
 
-        // UI components
-        private RectTransform rectTransform;
-        private Button button;
-        private Text text;
-
-        public DrawnVertex(int _id, int _depth, int _depthRank, Transform _transform) {
-            id = _id;
-            depth = _depth;
-            depthRank = _depthRank;
+        public DrawnVertex (Transform _transform) {
             transform = _transform;
-
-            rectTransform = transform.GetComponent<RectTransform>();
-            button = transform.GetComponent<Button>();
-            text = transform.GetComponentInChildren<Text>();
-
-            button.onClick.AddListener(() => {Debug.Log("Click");});
-        }
-
-        public void SetPosition(Vector2 position) {
-            rectTransform.anchoredPosition3D = new Vector3(position.x, position.y, 0);
-            text.text = "test";
-        }
-
-        public void SetText(string displayText) {
-            text.text = displayText;
         }
     }
 
-    // class DrawnLine {
+    class DrawnEdge {
+        public DrawnVertex source;
+        public DrawnVertex target;
 
-    // }
+        public DrawnEdge (DrawnVertex _source, DrawnVertex _target) {
+            source = _source;
+            target = _target;
+        }
+    }
 }
