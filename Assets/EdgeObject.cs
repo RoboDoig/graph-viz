@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EdgeLine : MonoBehaviour
+public class EdgeObject : MonoBehaviour
 {
     private LineRenderer lineRenderer;
     private Transform[] points;

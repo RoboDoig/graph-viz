@@ -529,7 +529,7 @@ MonoBehaviour:
   parentDisplay: {fileID: 1099589754}
   displayBounds: {x: 0, y: 0}
   vertexObject: {fileID: 4172634312143206712, guid: 417bb06b6a1e65548bbe136251378f58, type: 3}
-  lineObject: {fileID: 6535070071568420952, guid: 93832ec8b57bef940bb15d3a53d7c152, type: 3}
+  edgeObject: {fileID: 6535070071568420952, guid: 93832ec8b57bef940bb15d3a53d7c152, type: 3}
 --- !u!4 &1206571121
 Transform:
   m_ObjectHideFlags: 0
