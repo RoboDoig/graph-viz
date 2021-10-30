@@ -37,8 +37,8 @@ public class GraphVisualizer : MonoBehaviour
         // Calculate display bounds
         displayBounds = parentDisplay.sizeDelta;
 
-        InitializeGraph(graph);
-        ArrangeGraph(graph);
+        // InitializeGraph(graph);
+        // ArrangeGraph(graph);
     }
 
     void InitializeGraph(AdjacencyGraph<int, Edge<int>> graph) {
