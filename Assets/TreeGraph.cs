@@ -61,7 +61,6 @@ public class TreeGraph<TVertex, TEdge> : VisualizableGraph<TVertex, TEdge> where
     }
 
     void MinimumWS(Node startNode, int depth, int[] nexts) {
-        Debug.Log(startNode.id);
         startNode.depthRank = nexts[startNode.depth];
         startNode.depth = depth;
         nexts[depth] += 1;
