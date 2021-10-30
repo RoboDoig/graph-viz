@@ -33,7 +33,7 @@ public class GraphVisualizer : MonoBehaviour
                            new Edge<int>(2, 8),
                            new Edge<int>(5, 9)};
                            
-        graph = new HierarchicalGraph<int, Edge<int>>(edges);
+        graph = new TreeGraph<int, Edge<int>>(edges);
     }
 
     void Start() {

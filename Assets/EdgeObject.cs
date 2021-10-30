@@ -16,7 +16,7 @@ public class EdgeObject : MonoBehaviour
         this.points = points;
     }
 
-    private void Update() {
+    private void LateUpdate() {
         for (int i = 0; i < points.Length; i++) {
             lineRenderer.SetPosition(i, points[i].position);
         }

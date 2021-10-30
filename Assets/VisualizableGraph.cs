@@ -25,19 +25,20 @@ public class VisualizableGraph<TVertex, TEdge> where TEdge : IEdge<TVertex>
 
     }
 
-    public virtual void Draw() {
-        
-    }
-
     public class Node {
         public TVertex id;
         public int depth;
         public int depthRank;
+        public List<Node> children;
+        public List<Node> parents;
 
         public Node(TVertex id, int depth, int depthRank) {
             this.id = id;
             this.depth = depth;
             this.depthRank = depthRank;
+
+            children = new List<Node>();
+            parents = new List<Node>();
         }
     }
 }
