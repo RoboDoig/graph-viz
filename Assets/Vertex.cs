@@ -1,18 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class Vertex : MonoBehaviour
+public class Vertex : MonoBehaviour, IDragHandler
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+    private RectTransform rectTransform;
+    void Awake() {
+        rectTransform = GetComponent<RectTransform>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void OnDrag(PointerEventData eventData)
     {
-        
+        rectTransform.anchoredPosition += eventData.delta;
     }
 }

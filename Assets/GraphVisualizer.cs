@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using QuikGraph;
 using QuikGraph.Algorithms.Search;
+using UnityEngine.UI;
 
 public class GraphVisualizer : MonoBehaviour
 {
@@ -21,7 +22,14 @@ public class GraphVisualizer : MonoBehaviour
         // Create a graph
         var edges = new[] {new Edge<int>(0, 1), 
                            new Edge<int>(0, 2),
-                           new Edge<int>(1, 3)};
+                           new Edge<int>(1, 3),
+                           new Edge<int>(3, 4),
+                           new Edge<int>(2, 3),
+                           new Edge<int>(0, 5),
+                           new Edge<int>(2, 6),
+                           new Edge<int>(2, 7),
+                           new Edge<int>(2, 8),
+                           new Edge<int>(5, 9)};
         graph = edges.ToAdjacencyGraph<int, Edge<int>>();
     }
 
@@ -29,23 +37,23 @@ public class GraphVisualizer : MonoBehaviour
         // Calculate display bounds
         displayBounds = parentDisplay.sizeDelta;
 
-        DrawGraph(graph);
+        InitializeGraph(graph);
         ArrangeGraph(graph);
     }
 
-    void DrawGraph(AdjacencyGraph<int, Edge<int>> graph) {
+    void InitializeGraph(AdjacencyGraph<int, Edge<int>> graph) {
         vizGraph = new Dictionary<int, DrawnVertex>();
 
         foreach (var edge in graph.Edges) {
             // if source vertex hasn't been instantiated, create it
             if (!vizGraph.ContainsKey(edge.Source)) {
-                DrawnVertex newVertex = new DrawnVertex(edge.Source, 0, CreateVertex());
+                DrawnVertex newVertex = new DrawnVertex(edge.Source, 0, 0, CreateVertex());
                 vizGraph.Add(edge.Source, newVertex);
             }
 
             // if the target vertex hasn't been isntantiated, instantiate it
             if (!vizGraph.ContainsKey(edge.Target)) {
-                DrawnVertex newVertex = new DrawnVertex(edge.Target, 0, CreateVertex());
+                DrawnVertex newVertex = new DrawnVertex(edge.Target, 0, 0, CreateVertex());
                 vizGraph.Add(edge.Target, newVertex);
             }
 
@@ -61,10 +69,45 @@ public class GraphVisualizer : MonoBehaviour
         };
         dfs.Compute();
 
-        foreach(KeyValuePair<int, DrawnVertex> kvp in vizGraph) {
-            DrawnVertex drawnVertex = kvp.Value;
-            drawnVertex.SetPosition(new Vector2(0, drawnVertex.depth * 100));
+        Dictionary<int, int> depthRanks = new Dictionary<int, int>();
+        // Calculate depth rank
+        var bfs = new DepthFirstSearchAlgorithm<int, Edge<int>>(graph);
+        bfs.DiscoverVertex += (int vertex) => {
+            if (!depthRanks.ContainsKey(vizGraph[vertex].depth)) {
+                depthRanks.Add(vizGraph[vertex].depth, 0);
+            }
+
+            vizGraph[vertex].depthRank = depthRanks[vizGraph[vertex].depth];
+            depthRanks[vizGraph[vertex].depth] += 1;
+        };
+        bfs.Compute();
+
+        foreach(var vertex in graph.Vertices) {
+            vizGraph[vertex].SetPosition(new Vector2(vizGraph[vertex].depthRank * 100, vizGraph[vertex].depth * 100));
+            vizGraph[vertex].SetText(vertex.ToString());
         }
+    }
+
+    // Get the maximum depth of the graph
+    int GetMaxDepth(AdjacencyGraph<int, Edge<int>> graph) {
+        int maxDepth = int.MinValue;
+
+        var dfs = new DepthFirstSearchAlgorithm<int, Edge<int>>(graph);
+        Dictionary<int, int> vertexParents = new Dictionary<int, int>{{0, 0}};
+        dfs.TreeEdge += (Edge<int> edge) => {
+            if (!vertexParents.ContainsKey(edge.Target)) {
+                vertexParents.Add(edge.Target, 0);
+            }
+
+            vertexParents[edge.Target] = 1 + vertexParents[edge.Source];
+
+            if (vertexParents[edge.Target] > maxDepth) {
+                maxDepth = vertexParents[edge.Target];
+            }
+        };
+        dfs.Compute();
+
+        return maxDepth;
     }
 
     Transform CreateVertex() {
@@ -92,24 +135,38 @@ public class GraphVisualizer : MonoBehaviour
     class DrawnVertex {
         public int id;
         public int depth;
+        public int depthRank;
         public Transform transform;
 
+        // UI components
         private RectTransform rectTransform;
+        private Button button;
+        private Text text;
 
-        public DrawnVertex(int _id, int _depth, Transform _transform) {
+        public DrawnVertex(int _id, int _depth, int _depthRank, Transform _transform) {
             id = _id;
             depth = _depth;
+            depthRank = _depthRank;
             transform = _transform;
 
             rectTransform = transform.GetComponent<RectTransform>();
+            button = transform.GetComponent<Button>();
+            text = transform.GetComponentInChildren<Text>();
+
+            button.onClick.AddListener(() => {Debug.Log("Click");});
         }
 
         public void SetPosition(Vector2 position) {
             rectTransform.anchoredPosition3D = new Vector3(position.x, position.y, 0);
+            text.text = "test";
+        }
+
+        public void SetText(string displayText) {
+            text.text = displayText;
         }
     }
 
-    class DrawnLine {
+    // class DrawnLine {
 
-    }
+    // }
 }
