@@ -90,8 +90,8 @@ public class TreeGraph<TVertex, TEdge> : VisualizableGraph<TVertex, TEdge> where
         base.CalculatePositioning();
 
         int[] nexts = new int[maxDepth+1];
-        MinimumWS(rootNode, rootNode.depth, nexts);
-        // ReingoldTilford(rootNode);
+        // MinimumWS(rootNode, rootNode.depth, nexts); // TODO - this can't draw separate graphs rn because it runs out of children!
+        ReingoldTilford(rootNode);
     }
 
     void MinimumWS(Node startNode, int depth, int[] nexts) {
@@ -101,6 +101,7 @@ public class TreeGraph<TVertex, TEdge> : VisualizableGraph<TVertex, TEdge> where
         foreach (Node childNode in startNode.children) {
             MinimumWS(childNode, childNode.depth, nexts);
         }
+        // Debug.Log(startNode.id + ": " + startNode.depth + " " + startNode.depthRank);
     }
 
     void ReingoldTilford(Node startNode) {

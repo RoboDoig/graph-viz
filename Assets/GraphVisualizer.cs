@@ -31,8 +31,7 @@ public class GraphVisualizer : MonoBehaviour
                            new Edge<int>(2, 6),
                            new Edge<int>(2, 7),
                            new Edge<int>(2, 8),
-                           new Edge<int>(5, 9),
-                           new Edge<int>(20, 21)};
+                           new Edge<int>(5, 9)};
                            
         graph = new TreeGraph<int, Edge<int>>(edges);
     }
