@@ -13,6 +13,10 @@ public class GraphVisualizer : MonoBehaviour
     public VertexObject vertexObject;
     public EdgeObject edgeObject;
 
+    [Header("Attributs")]
+    public float depthSpacer;
+    public float widthSpacer;
+
     // graph definition
     private VisualizableGraph<int, Edge<int>> graph;
 
@@ -31,7 +35,11 @@ public class GraphVisualizer : MonoBehaviour
                            new Edge<int>(2, 6),
                            new Edge<int>(2, 7),
                            new Edge<int>(2, 8),
-                           new Edge<int>(5, 9)};
+                           new Edge<int>(5, 9),
+                           new Edge<int>(0, 10),
+                           new Edge<int>(10, 11),
+                           new Edge<int>(10, 12),
+                           new Edge<int>(10, 13)};
                            
         graph = new TreeGraph<int, Edge<int>>(edges);
     }
@@ -50,14 +58,14 @@ public class GraphVisualizer : MonoBehaviour
         foreach (var edge in graph.graph.Edges) {
             // Draw vertices
             if (!drawnVertices.ContainsKey(edge.Source)) {
-                Vector3 position = new Vector3(nodeData[edge.Source].x * 100, nodeData[edge.Source].y * 100, 0);
+                Vector3 position = new Vector3(nodeData[edge.Source].x * widthSpacer, nodeData[edge.Source].y * depthSpacer, 0);
                 string displayText = nodeData[edge.Source].id.ToString();
                 DrawnVertex newVertex = CreateVertex(position, displayText);
                 drawnVertices.Add(edge.Source, newVertex);
             }
 
             if (!drawnVertices.ContainsKey(edge.Target)) {
-                Vector3 position = new Vector3(nodeData[edge.Target].x * 100, nodeData[edge.Target].y * 100, 0);
+                Vector3 position = new Vector3(nodeData[edge.Target].x * widthSpacer, nodeData[edge.Target].y * depthSpacer, 0);
                 string displayText = nodeData[edge.Target].id.ToString();
                 DrawnVertex newVertex = CreateVertex(position, displayText);
                 drawnVertices.Add(edge.Target, newVertex);
