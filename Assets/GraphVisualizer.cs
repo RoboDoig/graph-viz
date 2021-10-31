@@ -31,7 +31,8 @@ public class GraphVisualizer : MonoBehaviour
                            new Edge<int>(2, 6),
                            new Edge<int>(2, 7),
                            new Edge<int>(2, 8),
-                           new Edge<int>(5, 9)};
+                           new Edge<int>(5, 9),
+                           new Edge<int>(20, 21)};
                            
         graph = new TreeGraph<int, Edge<int>>(edges);
     }
@@ -44,20 +45,21 @@ public class GraphVisualizer : MonoBehaviour
     }
 
     void DrawGraph() {
+        Dictionary<int, VisualizableGraph<int, Edge<int>>.NodeData> nodeData = graph.GetNodeData();
         drawnVertices = new Dictionary<int, DrawnVertex>();
 
         foreach (var edge in graph.graph.Edges) {
             // Draw vertices
             if (!drawnVertices.ContainsKey(edge.Source)) {
-                Vector3 position = new Vector3(graph.nodeGraph[edge.Source].depthRank * 100, graph.nodeGraph[edge.Source].depth * 100, 0);
-                string displayText = graph.nodeGraph[edge.Source].id.ToString();
+                Vector3 position = new Vector3(nodeData[edge.Source].x * 100, nodeData[edge.Source].y * 100, 0);
+                string displayText = nodeData[edge.Source].id.ToString();
                 DrawnVertex newVertex = CreateVertex(position, displayText);
                 drawnVertices.Add(edge.Source, newVertex);
             }
 
             if (!drawnVertices.ContainsKey(edge.Target)) {
-                Vector3 position = new Vector3(graph.nodeGraph[edge.Target].depthRank * 100, graph.nodeGraph[edge.Target].depth * 100, 0);
-                string displayText = graph.nodeGraph[edge.Target].id.ToString();
+                Vector3 position = new Vector3(nodeData[edge.Target].x * 100, nodeData[edge.Target].y * 100, 0);
+                string displayText = nodeData[edge.Target].id.ToString();
                 DrawnVertex newVertex = CreateVertex(position, displayText);
                 drawnVertices.Add(edge.Target, newVertex);
             }

@@ -1,1 +1,3 @@
 https://llimllib.github.io/pymag-trees/
+
+https://rachel53461.wordpress.com/2014/04/20/algorithm-for-drawing-trees/
