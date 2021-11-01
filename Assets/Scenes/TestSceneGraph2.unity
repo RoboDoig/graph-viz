@@ -509,7 +509,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 300}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &948242699
@@ -823,7 +823,7 @@ MonoBehaviour:
   vertexObject: {fileID: 4172634312143206712, guid: 417bb06b6a1e65548bbe136251378f58, type: 3}
   edgeObject: {fileID: 6535070071568420952, guid: 93832ec8b57bef940bb15d3a53d7c152, type: 3}
   depthSpacer: 100
-  widthSpacer: 200
+  widthSpacer: 100
 --- !u!4 &1206571121
 Transform:
   m_ObjectHideFlags: 0

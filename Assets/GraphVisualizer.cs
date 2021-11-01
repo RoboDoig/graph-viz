@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using QuikGraph;
@@ -39,9 +40,13 @@ public class GraphVisualizer : MonoBehaviour
                            new Edge<int>(0, 10),
                            new Edge<int>(10, 11),
                            new Edge<int>(10, 12),
-                           new Edge<int>(10, 13)};
+                           new Edge<int>(10, 13),
+                           new Edge<int>(10, 14),
+                           new Edge<int>(5, 15),
+                           new Edge<int>(1, 15)};
                            
-        graph = new TreeGraph<int, Edge<int>>(edges);
+        // graph = new TreeGraph<int, Edge<int>>(edges);
+        graph  = new ForceGraph<int, Edge<int>>(edges);
     }
 
     void Start() {
@@ -49,6 +54,8 @@ public class GraphVisualizer : MonoBehaviour
         displayBounds = parentDisplay.sizeDelta;
 
         DrawGraph();
+
+        CenterGraph();
     }
 
     void DrawGraph() {
@@ -76,12 +83,23 @@ public class GraphVisualizer : MonoBehaviour
         }
     }
 
+    // TODO - centering on content rect
+    void CenterGraph() {
+        DrawnVertex firstVertex = drawnVertices[graph.graph.Edges.First().Source];
+        Vector3 vertexPosition = firstVertex.vertexObject.GetPosition();
+        vertexPosition.y += displayBounds.y;
+
+        foreach (DrawnVertex drawnVertex in drawnVertices.Values) {
+            drawnVertex.vertexObject.SetPosition(drawnVertex.vertexObject.GetPosition() - vertexPosition);
+        }
+    }
+
     DrawnVertex CreateVertex(Vector3 position, string displayText) {
         VertexObject newVertex = Instantiate(vertexObject, Vector3.zero, Quaternion.identity, parentDisplay);
         newVertex.SetPosition(position);
         newVertex.SetText(displayText);
 
-        return new DrawnVertex(newVertex.transform);
+        return new DrawnVertex(newVertex.transform, newVertex);
     }
 
     DrawnEdge CreateEdge(DrawnVertex start, DrawnVertex end) {
@@ -93,9 +111,11 @@ public class GraphVisualizer : MonoBehaviour
 
     class DrawnVertex {
         public Transform transform;
+        public VertexObject vertexObject;
 
-        public DrawnVertex (Transform _transform) {
+        public DrawnVertex (Transform _transform, VertexObject _vertexObject) {
             transform = _transform;
+            vertexObject = _vertexObject;
         }
     }
 

@@ -17,6 +17,10 @@ public class VertexObject : MonoBehaviour, IDragHandler
         rectTransform.anchoredPosition3D = position;
     }
 
+    public Vector3 GetPosition() {
+        return rectTransform.anchoredPosition3D;
+    }
+
     public void SetText(string displayText) {
         text.text = displayText;
     }
