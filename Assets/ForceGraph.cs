@@ -44,8 +44,8 @@ public class ForceGraph<TVertex, TEdge> : VisualizableGraph<TVertex, TEdge> wher
     {
         base.CalculatePositioning();
 
-        // Eades();
-        Barycenter(10);
+        Eades();
+        // Barycenter(10);
     }
 
     void Eades() {
@@ -77,6 +77,7 @@ public class ForceGraph<TVertex, TEdge> : VisualizableGraph<TVertex, TEdge> wher
                         continue;
                     }
 
+                    // TODO - repeated code from above, make some kind of force calculation / move vector method
                     Vector2 otherNodePosition = otherNode.NodePosition();
                     Vector2 moveDirection = (nodePosition - otherNodePosition);
                     float distance = moveDirection.magnitude;
