@@ -17,7 +17,7 @@ public class EdgeObject : MonoBehaviour
 
     private void Update() {
         // DrawStraightLine();
-        DrawSineWave(0.05f, 0.1f, 200);
+        DrawSineWave(1f, 0.5f, 200);
     }
 
     private void DrawStraightLine() {
@@ -27,7 +27,7 @@ public class EdgeObject : MonoBehaviour
         }
     }
 
-    // TODO - only sort of works
+    // https://stackoverflow.com/questions/44692895/sinusoidal-or-other-custom-move-type-between-two-points
     private void DrawSineWave(float amplitude, float wavelength, int nPoints) {
         lineRenderer.positionCount = nPoints;
         Vector3 p1 = points[0].position;
@@ -37,30 +37,20 @@ public class EdgeObject : MonoBehaviour
         float dy = p2.y - p1.y;
         float distance = Mathf.Sqrt(dx * dx + dy * dy);
         float a = Mathf.Atan2(dy, dx);
-        // float cosa = Mathf.Cos(a);
-        // float sina = Mathf.Sin(a);
 
-        // Vector3 pointPos = Vector3.zero;
-        // for (int i = 0; i < lineRenderer.positionCount; i++) {
-        //     // untransformed wave
-        //     float tx = (float)i / (float)nPoints;
-        //     float ty = amplitude * Mathf.Sin(tx * 2 * Mathf.PI) / wavelength;
-
-        //     // apply transform
-        //     float x = p1.x + distance * (tx * cosa - ty * sina);
-        //     float y = p1.y + distance * (tx * sina + ty * cosa);
-
-        //     lineRenderer.SetPosition(i, new Vector3(x, y, p1.z));
-        // }
-
+        Vector3 newPosition = new Vector3(0, 0, p1.z);
         for (int i = 0; i < lineRenderer.positionCount; i++) {
-            float tx = (float)i / (float)nPoints; // proportion along line
-            float ty = moveVec.y * tx;
+            float tx = (float)i / (float)nPoints * distance; // proportion/distance along line
+            
+            newPosition.x = p1.x + Mathf.Cos(a) * tx;
+            newPosition.y = p1.y + Mathf.Sin(a) * tx;
 
-            float x = p1.x + (moveVec * tx).x;
-            float y = p1.y + (moveVec * tx).y;
+            float deviation = Mathf.Sin(tx * Mathf.PI / wavelength) * amplitude;
 
-            lineRenderer.SetPosition(i, new Vector3(x, y, p1.z));
+            newPosition.x += Mathf.Sin(a) * deviation;
+            newPosition.y -= Mathf.Cos(a) * deviation;
+
+            lineRenderer.SetPosition(i, newPosition);
         }
     }
 }
