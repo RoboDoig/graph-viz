@@ -27,23 +27,38 @@ public class GraphVisualizer : MonoBehaviour
 
     void Awake() {
         // Create a graph
+        // var edges = new[] {new Edge<int>(0, 1), 
+        //                    new Edge<int>(0, 2),
+        //                    new Edge<int>(1, 3),
+        //                    new Edge<int>(3, 4),
+        //                    new Edge<int>(2, 3),
+        //                    new Edge<int>(0, 5),
+        //                    new Edge<int>(2, 6),
+        //                    new Edge<int>(2, 7),
+        //                    new Edge<int>(2, 8),
+        //                    new Edge<int>(5, 9),
+        //                    new Edge<int>(0, 10),
+        //                    new Edge<int>(10, 11),
+        //                    new Edge<int>(10, 12),
+        //                    new Edge<int>(10, 13),
+        //                    new Edge<int>(10, 14),
+        //                    new Edge<int>(5, 15),
+        //                    new Edge<int>(1, 15)};
+
         var edges = new[] {new Edge<int>(0, 1), 
                            new Edge<int>(0, 2),
-                           new Edge<int>(1, 3),
-                           new Edge<int>(3, 4),
-                           new Edge<int>(2, 3),
+                           new Edge<int>(0, 3),
+                           new Edge<int>(0, 4),
                            new Edge<int>(0, 5),
-                           new Edge<int>(2, 6),
-                           new Edge<int>(2, 7),
-                           new Edge<int>(2, 8),
-                           new Edge<int>(5, 9),
-                           new Edge<int>(0, 10),
-                           new Edge<int>(10, 11),
-                           new Edge<int>(10, 12),
-                           new Edge<int>(10, 13),
-                           new Edge<int>(10, 14),
-                           new Edge<int>(5, 15),
-                           new Edge<int>(1, 15)};
+                           new Edge<int>(1, 10),
+                           new Edge<int>(1, 11),
+                           new Edge<int>(1, 12),
+                           new Edge<int>(1, 13),
+                           new Edge<int>(10, 20),
+                           new Edge<int>(10, 21),
+                           new Edge<int>(10, 22),
+                           new Edge<int>(10, 23),
+                           new Edge<int>(10, 24)};
 
         graph = new RadialTreeGraph<int, Edge<int>>(edges);              
         // graph = new TreeGraph<int, Edge<int>>(edges);
