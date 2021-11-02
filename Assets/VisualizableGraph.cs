@@ -36,6 +36,7 @@ public class VisualizableGraph<TVertex, TEdge> where TEdge : IEdge<TVertex>
         public float y;
         public List<NodeData> parentNodes;
         public List<NodeData> childNodes;
+        public bool isLeaf = false;
 
         public NodeData(TVertex id, float x, float y) {
             this.id = id;

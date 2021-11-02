@@ -12,7 +12,6 @@ public class RadialTreeGraph<TVertex, TEdge> : TreeGraph<TVertex, TEdge> where T
 
     public override Dictionary<TVertex, NodeData> GetNodeData() {
         Dictionary<TVertex, NodeData> nodeData = new Dictionary<TVertex, NodeData>();
-        Dictionary<int, float> maxDepthRank = new Dictionary<int, float>();
 
         // Add node data
         foreach (Node node in nodeGraph.Values) {
@@ -22,16 +21,7 @@ public class RadialTreeGraph<TVertex, TEdge> : TreeGraph<TVertex, TEdge> where T
                 node.depth
             );
 
-            Debug.Log(node.depthRank);
-
             nodeData.Add(newNodeData.id, newNodeData);
-
-            if (!maxDepthRank.ContainsKey(node.depth)) {
-                maxDepthRank.Add(node.depth, 0);
-            }
-            if (node.depthRank > maxDepthRank[node.depth]) {
-                maxDepthRank[node.depth] = node.depthRank;
-            }
         }
 
         // Determine each node's parents and children
@@ -49,19 +39,9 @@ public class RadialTreeGraph<TVertex, TEdge> : TreeGraph<TVertex, TEdge> where T
             }
         }
 
-        // Calculate radial position
-        foreach (Node node in nodeGraph.Values) {
-            float theta;
-            if (maxDepthRank[node.depth] == 0) {
-                theta = 0f;
-            } else {
-                theta = (Mathf.PI * 2) / maxDepthRank[node.depth];
-            }
-            float angle = theta * node.depthRank;
-
-            nodeData[node.id].x = node.depth * Mathf.Cos(angle);
-            nodeData[node.id].y = node.depth * Mathf.Sin(angle);
-        }
+        nodeData[rootNode.id].x = 0;
+        nodeData[rootNode.id].y = 0;
+        RadialPositions(nodeData[rootNode.id], 0, Mathf.PI * 2);
 
         return nodeData;
     }
@@ -70,10 +50,48 @@ public class RadialTreeGraph<TVertex, TEdge> : TreeGraph<TVertex, TEdge> where T
     {
         int[] nexts = new int[maxDepth + 1];
         // MinimumWS(rootNode, rootNode.depth, nexts);
-        ReingoldTilford(rootNode);
+        // ReingoldTilford(rootNode);
+    }
+
+    // https://stackoverflow.com/questions/46989871/why-radial-tree-layout-drawing-algorithm-is-making-crossed-edges
+    void RadialPositions(NodeData startNode, float alpha, float beta) {
+        float d = (float)nodeGraph[startNode.id].depth;
+        float theta = alpha;
+        float radius = 1 + (d * 1f);
+        
+        int nTreeLeaves = CountLeavesInTree(startNode);
+        foreach(NodeData childNode in startNode.childNodes) {
+            int nLeaves = CountLeavesInTree(childNode);
+            float mu = theta + ((float)nLeaves / (float)nTreeLeaves) * (beta - alpha);
+
+            float x = radius * Mathf.Cos((theta + mu) / 2f);
+            float y = radius * Mathf.Sin((theta + mu) / 2f);
+
+            childNode.x = x;
+            childNode.y = y;
+
+            if (childNode.childNodes.Count > 0) {
+                RadialPositions(childNode, theta, mu);
+            }
+
+            theta = mu;
+        }
     }
 
     void ReingoldTilfordRadial(Node startNode) {
         
+    }
+
+    int CountLeavesInTree(NodeData node) {
+        if (node.childNodes.Count == 0) {
+            return 1;
+        }
+
+        int total = 0;
+        foreach(NodeData childNode in node.childNodes) {
+            total += CountLeavesInTree(childNode);
+        }
+
+        return total;
     }
 }
