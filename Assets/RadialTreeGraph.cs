@@ -41,12 +41,7 @@ public class RadialTreeGraph<TVertex, TEdge> : TreeGraph<TVertex, TEdge> where T
 
         nodeData[rootNode.id].x = 0;
         nodeData[rootNode.id].y = 0;
-        RadialPositions(nodeData[rootNode.id], 0f, Mathf.PI * 2);
-
-        // foreach (NodeData node in nodeData.Values) {
-        //     // Calculate radial position
-        //     RadialPositions(node, 0f, Mathf.PI * 2);
-        // }
+        RadialPositions(nodeData[rootNode.id], 0, Mathf.PI * 2);
 
         return nodeData;
     }
@@ -55,26 +50,25 @@ public class RadialTreeGraph<TVertex, TEdge> : TreeGraph<TVertex, TEdge> where T
     {
         int[] nexts = new int[maxDepth + 1];
         // MinimumWS(rootNode, rootNode.depth, nexts);
-        ReingoldTilford(rootNode);
+        // ReingoldTilford(rootNode);
     }
 
+    // https://stackoverflow.com/questions/46989871/why-radial-tree-layout-drawing-algorithm-is-making-crossed-edges
     void RadialPositions(NodeData startNode, float alpha, float beta) {
         float d = (float)nodeGraph[startNode.id].depth;
         float theta = alpha;
-        float radius = 1 + (d * Mathf.PI);
+        float radius = 1 + (d * 1f);
         
         int nTreeLeaves = CountLeavesInTree(startNode);
         foreach(NodeData childNode in startNode.childNodes) {
             int nLeaves = CountLeavesInTree(childNode);
-            float mu = theta + ((float)nLeaves / (float)nTreeLeaves * (beta - alpha));
+            float mu = theta + ((float)nLeaves / (float)nTreeLeaves) * (beta - alpha);
 
             float x = radius * Mathf.Cos((theta + mu) / 2f);
             float y = radius * Mathf.Sin((theta + mu) / 2f);
 
             childNode.x = x;
             childNode.y = y;
-
-            Debug.Log(childNode.x + ", " + childNode.y);
 
             if (childNode.childNodes.Count > 0) {
                 RadialPositions(childNode, theta, mu);
