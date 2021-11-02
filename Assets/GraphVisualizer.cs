@@ -71,7 +71,20 @@ public class GraphVisualizer : MonoBehaviour
                            new Edge<int>(10, 53),
                            new Edge<int>(10, 54),
                            new Edge<int>(10, 55),
-                           new Edge<int>(10, 56)};
+                           new Edge<int>(10, 56),
+                           new Edge<int>(6, 60),
+                           new Edge<int>(6, 61),
+                           new Edge<int>(6, 62),
+                           new Edge<int>(6, 63),
+                           new Edge<int>(20, 70),
+                           new Edge<int>(20, 71),
+                           new Edge<int>(20, 72),
+                           new Edge<int>(20, 73),
+                           new Edge<int>(62, 80),
+                           new Edge<int>(62, 81),
+                           new Edge<int>(62, 82),
+                           new Edge<int>(62, 83),
+                           new Edge<int>(63, 83)};
 
         graph = new RadialTreeGraph<int, Edge<int>>(edges);              
         // graph = new TreeGraph<int, Edge<int>>(edges);
@@ -91,8 +104,9 @@ public class GraphVisualizer : MonoBehaviour
         Dictionary<int, VisualizableGraph<int, Edge<int>>.NodeData> nodeData = graph.GetNodeData();
         drawnVertices = new Dictionary<int, DrawnVertex>();
 
+        // for each defined edge in the graph
         foreach (var edge in graph.graph.Edges) {
-            // Draw vertices
+            // Draw the source vertex if not already drawn
             if (!drawnVertices.ContainsKey(edge.Source)) {
                 Vector3 position = new Vector3(nodeData[edge.Source].x * widthSpacer, nodeData[edge.Source].y * depthSpacer, 0);
                 string displayText = nodeData[edge.Source].id.ToString();
@@ -100,6 +114,7 @@ public class GraphVisualizer : MonoBehaviour
                 drawnVertices.Add(edge.Source, newVertex);
             }
 
+            // Draw the target vertex if not already drawn
             if (!drawnVertices.ContainsKey(edge.Target)) {
                 Vector3 position = new Vector3(nodeData[edge.Target].x * widthSpacer, nodeData[edge.Target].y * depthSpacer, 0);
                 string displayText = nodeData[edge.Target].id.ToString();
@@ -107,7 +122,7 @@ public class GraphVisualizer : MonoBehaviour
                 drawnVertices.Add(edge.Target, newVertex);
             }
 
-            // Draw edge
+            // Draw the edge between them
             CreateEdge(drawnVertices[edge.Source], drawnVertices[edge.Target]);
         }
     }
