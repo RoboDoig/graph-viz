@@ -44,8 +44,9 @@ public class GraphVisualizer : MonoBehaviour
                            new Edge<int>(10, 14),
                            new Edge<int>(5, 15),
                            new Edge<int>(1, 15)};
-                           
-        graph = new TreeGraph<int, Edge<int>>(edges);
+
+        graph = new RadialTreeGraph<int, Edge<int>>(edges);              
+        // graph = new TreeGraph<int, Edge<int>>(edges);
         // graph  = new ForceGraph<int, Edge<int>>(edges);
     }
 

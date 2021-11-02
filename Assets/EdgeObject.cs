@@ -16,8 +16,8 @@ public class EdgeObject : MonoBehaviour
     }
 
     private void Update() {
-        // DrawStraightLine();
-        DrawSineWave(1f, 0.5f, 1000);
+        DrawStraightLine();
+        // DrawSineWave(1f, 0.5f, 1000);
     }
 
     private void DrawStraightLine() {

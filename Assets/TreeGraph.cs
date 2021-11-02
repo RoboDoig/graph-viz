@@ -7,8 +7,8 @@ using QuikGraph.Algorithms.Search;
 
 public class TreeGraph<TVertex, TEdge> : VisualizableGraph<TVertex, TEdge> where TEdge : IEdge<TVertex>
 {
-    private Node rootNode;
-    private int maxDepth = int.MinValue;
+    protected Node rootNode;
+    protected int maxDepth = int.MinValue;
     
     public Dictionary<TVertex, Node> nodeGraph {get; protected set;}
 
@@ -59,6 +59,7 @@ public class TreeGraph<TVertex, TEdge> : VisualizableGraph<TVertex, TEdge> where
     {
         Dictionary<TVertex, NodeData> nodeData = new Dictionary<TVertex, NodeData>();
 
+        // Add each node 
         foreach (Node node in nodeGraph.Values) {
             NodeData newNodeData = new NodeData (
                 node.id,
@@ -69,6 +70,7 @@ public class TreeGraph<TVertex, TEdge> : VisualizableGraph<TVertex, TEdge> where
             nodeData.Add(newNodeData.id, newNodeData);
         }
 
+        // Determine each node's parents and children
         foreach (Node node in nodeGraph.Values) {
             if (node.parents != null) {
                 foreach (Node parentNode in node.parents) {
@@ -88,14 +90,12 @@ public class TreeGraph<TVertex, TEdge> : VisualizableGraph<TVertex, TEdge> where
 
     protected override void CalculatePositioning()
     {
-        base.CalculatePositioning();
-
         int[] nexts = new int[maxDepth+1];
         // MinimumWS(rootNode, rootNode.depth, nexts); // TODO - this can't draw separate graphs rn because it runs out of children!
         ReingoldTilford(rootNode); // TODO - same here
     }
 
-    void MinimumWS(Node startNode, int depth, int[] nexts) {
+    protected void MinimumWS(Node startNode, int depth, int[] nexts) {
         startNode.depthRank = nexts[startNode.depth];
         startNode.depth = depth;
         nexts[depth] += 1;
@@ -104,7 +104,7 @@ public class TreeGraph<TVertex, TEdge> : VisualizableGraph<TVertex, TEdge> where
         }
     }
 
-    void ReingoldTilford(Node startNode) {
+    protected void ReingoldTilford(Node startNode) {
         CalculateInitialX(startNode);
 
         CalculateFinalPositions(startNode, 0);
