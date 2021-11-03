@@ -54,7 +54,7 @@ public class ForceGraph<TVertex, TEdge> : VisualizableGraph<TVertex, TEdge> wher
         float c3 = 1f;
         float c4 = 0.1f;
 
-        // force calculation iterations
+        // force calculation iterations - TODO, hard coded 100 bad for larger graphs!
         for (int i = 0; i < 100; i++) {
 
             // for each vertex, calculate its force

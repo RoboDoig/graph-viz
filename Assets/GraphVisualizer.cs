@@ -88,8 +88,8 @@ public class GraphVisualizer : MonoBehaviour
 
         Edge<int>[] edges = GraphFactory(3, 3);
 
-        graph = new RadialTreeGraph<int, Edge<int>>(edges);              
-        // graph = new TreeGraph<int, Edge<int>>(edges);
+        // graph = new RadialTreeGraph<int, Edge<int>>(edges);              
+        graph = new TreeGraph<int, Edge<int>>(edges);
         // graph  = new ForceGraph<int, Edge<int>>(edges);
     }
 
