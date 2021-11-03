@@ -45,50 +45,74 @@ public class GraphVisualizer : MonoBehaviour
         //                    new Edge<int>(5, 15),
         //                    new Edge<int>(1, 15)};
 
-        var edges = new[] {new Edge<int>(0, 1), 
-                           new Edge<int>(0, 2),
-                           new Edge<int>(0, 3),
-                           new Edge<int>(0, 4),
-                           new Edge<int>(0, 5),
-                           new Edge<int>(0, 6),
-                           new Edge<int>(1, 10),
-                           new Edge<int>(1, 11),
-                           new Edge<int>(4, 20),
-                           new Edge<int>(4, 21),
-                           new Edge<int>(4, 22),
-                           new Edge<int>(5, 30),
-                           new Edge<int>(5, 31),
-                           new Edge<int>(5, 32),
-                           new Edge<int>(5, 33),
-                           new Edge<int>(30, 40),
-                           new Edge<int>(30, 41),
-                           new Edge<int>(30, 42),
-                           new Edge<int>(30, 43),
-                           new Edge<int>(30, 44),
-                           new Edge<int>(30, 45),
-                           new Edge<int>(10, 51),
-                           new Edge<int>(10, 52),
-                           new Edge<int>(10, 53),
-                           new Edge<int>(10, 54),
-                           new Edge<int>(10, 55),
-                           new Edge<int>(10, 56),
-                           new Edge<int>(6, 60),
-                           new Edge<int>(6, 61),
-                           new Edge<int>(6, 62),
-                           new Edge<int>(6, 63),
-                           new Edge<int>(20, 70),
-                           new Edge<int>(20, 71),
-                           new Edge<int>(20, 72),
-                           new Edge<int>(20, 73),
-                           new Edge<int>(62, 80),
-                           new Edge<int>(62, 81),
-                           new Edge<int>(62, 82),
-                           new Edge<int>(62, 83),
-                           new Edge<int>(63, 83)};
+        // var edges = new[] {new Edge<int>(0, 1), 
+        //                    new Edge<int>(0, 2),
+        //                    new Edge<int>(0, 3),
+        //                    new Edge<int>(0, 4),
+        //                    new Edge<int>(0, 5),
+        //                    new Edge<int>(0, 6),
+        //                    new Edge<int>(1, 10),
+        //                    new Edge<int>(1, 11),
+        //                    new Edge<int>(4, 20),
+        //                    new Edge<int>(4, 21),
+        //                    new Edge<int>(4, 22),
+        //                    new Edge<int>(5, 30),
+        //                    new Edge<int>(5, 31),
+        //                    new Edge<int>(5, 32),
+        //                    new Edge<int>(5, 33),
+        //                    new Edge<int>(30, 40),
+        //                    new Edge<int>(30, 41),
+        //                    new Edge<int>(30, 42),
+        //                    new Edge<int>(30, 43),
+        //                    new Edge<int>(30, 44),
+        //                    new Edge<int>(30, 45),
+        //                    new Edge<int>(10, 51),
+        //                    new Edge<int>(10, 52),
+        //                    new Edge<int>(10, 53),
+        //                    new Edge<int>(10, 54),
+        //                    new Edge<int>(10, 55),
+        //                    new Edge<int>(10, 56),
+        //                    new Edge<int>(6, 60),
+        //                    new Edge<int>(6, 61),
+        //                    new Edge<int>(6, 62),
+        //                    new Edge<int>(6, 63),
+        //                    new Edge<int>(20, 70),
+        //                    new Edge<int>(20, 71),
+        //                    new Edge<int>(20, 72),
+        //                    new Edge<int>(20, 73),
+        //                    new Edge<int>(62, 80),
+        //                    new Edge<int>(62, 81),
+        //                    new Edge<int>(62, 82),
+        //                    new Edge<int>(62, 83),
+        //                    new Edge<int>(63, 83)};
+
+        Edge<int>[] edges = GraphFactory(3, 3);
 
         graph = new RadialTreeGraph<int, Edge<int>>(edges);              
         // graph = new TreeGraph<int, Edge<int>>(edges);
         // graph  = new ForceGraph<int, Edge<int>>(edges);
+    }
+
+    Edge<int>[] GraphFactory(int depth, int nChildren) {
+        List<Edge<int>> edgeList = new List<Edge<int>>();
+        int counter = 0;
+        BuildGraphRecursive(edgeList, 0, depth, nChildren, ref counter);
+
+        return edgeList.ToArray();
+    }
+
+    void BuildGraphRecursive(List<Edge<int>> edges, int parent, int depth, int nChildren, ref int counter) {
+        int thisNode = counter;
+        edges.Add(new Edge<int>(parent, thisNode));
+
+        if (depth == 0) {
+            return;
+        }
+
+        for (int i = 0; i < nChildren; i++) {
+            counter++;
+            BuildGraphRecursive(edges, thisNode, depth-1, nChildren, ref counter);
+        }
     }
 
     void Start() {

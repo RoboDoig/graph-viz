@@ -48,7 +48,7 @@ public class RadialTreeGraph<TVertex, TEdge> : TreeGraph<TVertex, TEdge> where T
 
     protected override void CalculatePositioning()
     {
-        int[] nexts = new int[maxDepth + 1];
+        // int[] nexts = new int[maxDepth + 1];
     }
 
     // https://stackoverflow.com/questions/46989871/why-radial-tree-layout-drawing-algorithm-is-making-crossed-edges
