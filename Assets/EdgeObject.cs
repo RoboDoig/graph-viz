@@ -13,8 +13,10 @@ public class EdgeObject : MonoBehaviour
 
     public void DefinePoints(Transform[] points) {
         this.points = points;
+        DrawStraightLine();
     }
 
+    // TODO - most of the time edges are static and don't need to update
     private void Update() {
         DrawStraightLine();
         // DrawSineWave(1f, 0.5f, 1000);

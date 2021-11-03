@@ -48,9 +48,7 @@ public class RadialTreeGraph<TVertex, TEdge> : TreeGraph<TVertex, TEdge> where T
 
     protected override void CalculatePositioning()
     {
-        int[] nexts = new int[maxDepth + 1];
-        // MinimumWS(rootNode, rootNode.depth, nexts);
-        // ReingoldTilford(rootNode);
+        // int[] nexts = new int[maxDepth + 1];
     }
 
     // https://stackoverflow.com/questions/46989871/why-radial-tree-layout-drawing-algorithm-is-making-crossed-edges
@@ -78,10 +76,7 @@ public class RadialTreeGraph<TVertex, TEdge> : TreeGraph<TVertex, TEdge> where T
         }
     }
 
-    void ReingoldTilfordRadial(Node startNode) {
-        
-    }
-
+    // TODO - maybe this should be a node method
     int CountLeavesInTree(NodeData node) {
         if (node.childNodes.Count == 0) {
             return 1;

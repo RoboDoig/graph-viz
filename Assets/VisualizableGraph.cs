@@ -30,13 +30,13 @@ public class VisualizableGraph<TVertex, TEdge> where TEdge : IEdge<TVertex>
         return nodeData;
     }
 
+    // This is the data needed to actually draw the graph and relate nodes to each other
     public class NodeData {
         public TVertex id;
         public float x;
         public float y;
         public List<NodeData> parentNodes;
         public List<NodeData> childNodes;
-        public bool isLeaf = false;
 
         public NodeData(TVertex id, float x, float y) {
             this.id = id;
