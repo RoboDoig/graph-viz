@@ -9,7 +9,6 @@ using UnityEngine.UI;
 public class GraphVisualizer : MonoBehaviour
 {
     public RectTransform parentDisplay;
-    [SerializeField]
     private Vector2 displayBounds;
     public VertexObject vertexObject;
     public EdgeObject edgeObject;
@@ -25,6 +24,7 @@ public class GraphVisualizer : MonoBehaviour
     private VisualizableGraph<int, Edge<int>> graph;
 
     // graph data cache
+    Dictionary<int, VisualizableGraph<int, Edge<int>>.NodeData> nodeData;
     Dictionary<int, DrawnVertex> drawnVertices = new Dictionary<int, DrawnVertex>();
     List<DrawnEdge> drawnLines = new List<DrawnEdge>();
 
@@ -88,16 +88,6 @@ public class GraphVisualizer : MonoBehaviour
         //                    new Edge<int>(62, 82),
         //                    new Edge<int>(62, 83),
         //                    new Edge<int>(63, 83)};
-
-        Edge<int>[] edges = GraphFactory(3, 3);
-
-        if (graphType == GraphType.Tree) {
-            graph = new TreeGraph<int, Edge<int>>(edges);
-        } else if (graphType == GraphType.RadialTree) {
-            graph = new RadialTreeGraph<int, Edge<int>>(edges);
-        } else if (graphType == GraphType.Force) {
-            graph  = new ForceGraph<int, Edge<int>>(edges);
-        }
     }
 
     Edge<int>[] GraphFactory(int depth, int nChildren) {
@@ -126,6 +116,8 @@ public class GraphVisualizer : MonoBehaviour
         // Calculate display bounds
         displayBounds = parentDisplay.sizeDelta;
 
+        GenerateGraph();
+
         DrawGraph();
 
         CenterGraph();
@@ -133,12 +125,28 @@ public class GraphVisualizer : MonoBehaviour
 
     // Interface for switching layout / shape at run time notes...
     // If we already have a graph and want to change layout...
-    //
+    // 1. we have existing node data, and generate new node data
+    // 2. we can then match each original node to its new data with the nodeData dict
+    // 3. each node is moved to new position, maybe with some animation
+
     // If we have new, added or removed graph data
     // 
 
+    void GenerateGraph() {
+        Edge<int>[] edges = GraphFactory(3, 3);
+
+        if (graphType == GraphType.Tree) {
+            graph = new TreeGraph<int, Edge<int>>(edges);
+        } else if (graphType == GraphType.RadialTree) {
+            graph = new RadialTreeGraph<int, Edge<int>>(edges);
+        } else if (graphType == GraphType.Force) {
+            graph  = new ForceGraph<int, Edge<int>>(edges);
+        }
+
+        nodeData = graph.GetNodeData();
+    }
+
     void DrawGraph() {
-        Dictionary<int, VisualizableGraph<int, Edge<int>>.NodeData> nodeData = graph.GetNodeData();
         drawnVertices = new Dictionary<int, DrawnVertex>();
 
         // for each defined edge in the graph
@@ -163,6 +171,18 @@ public class GraphVisualizer : MonoBehaviour
             // Draw the edge between them
             CreateEdge(drawnVertices[edge.Source], drawnVertices[edge.Target]);
         }
+    }
+
+    void UpdateLayout() {
+        GenerateGraph();
+
+        foreach (int id in drawnVertices.Keys) {
+            Vector3 position = new Vector3(nodeData[id].x * widthSpacer, nodeData[id].y * depthSpacer, 0);
+            position = RotatePointAroundPivot(position, Vector3.zero, new Vector3(0, 0, rotationDegrees));
+            drawnVertices[id].vertexObject.SetPosition(position);
+        }
+
+        CenterGraph();
     }
 
     Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles) {
@@ -219,7 +239,9 @@ public class GraphVisualizer : MonoBehaviour
         }
     }
 
-    // void OnValidate() {
-    //     DrawGraph();
-    // }
+    void OnValidate() {
+        if (Application.isPlaying) {
+            UpdateLayout();
+        }
+    }
 }
