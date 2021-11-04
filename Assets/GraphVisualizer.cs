@@ -9,19 +9,22 @@ using UnityEngine.UI;
 public class GraphVisualizer : MonoBehaviour
 {
     public RectTransform parentDisplay;
-    [SerializeField]
     private Vector2 displayBounds;
     public VertexObject vertexObject;
     public EdgeObject edgeObject;
 
-    [Header("Attributs")]
+    public enum GraphType {Tree, RadialTree, Force}
+    [Header("Attributes")]
+    public GraphType graphType;
     public float depthSpacer;
     public float widthSpacer;
+    public float rotationDegrees;
 
     // graph definition
     private VisualizableGraph<int, Edge<int>> graph;
 
     // graph data cache
+    Dictionary<int, VisualizableGraph<int, Edge<int>>.NodeData> nodeData;
     Dictionary<int, DrawnVertex> drawnVertices = new Dictionary<int, DrawnVertex>();
     List<DrawnEdge> drawnLines = new List<DrawnEdge>();
 
@@ -85,12 +88,6 @@ public class GraphVisualizer : MonoBehaviour
         //                    new Edge<int>(62, 82),
         //                    new Edge<int>(62, 83),
         //                    new Edge<int>(63, 83)};
-
-        Edge<int>[] edges = GraphFactory(3, 3);
-
-        // graph = new RadialTreeGraph<int, Edge<int>>(edges);              
-        graph = new TreeGraph<int, Edge<int>>(edges);
-        // graph  = new ForceGraph<int, Edge<int>>(edges);
     }
 
     Edge<int>[] GraphFactory(int depth, int nChildren) {
@@ -119,13 +116,37 @@ public class GraphVisualizer : MonoBehaviour
         // Calculate display bounds
         displayBounds = parentDisplay.sizeDelta;
 
+        GenerateGraph();
+
         DrawGraph();
 
         CenterGraph();
     }
 
+    // Interface for switching layout / shape at run time notes...
+    // If we already have a graph and want to change layout...
+    // 1. we have existing node data, and generate new node data
+    // 2. we can then match each original node to its drawn data with the id
+    // 3. each drawn node is moved to new position, maybe with some animation
+
+    // If we have new, added or removed graph data
+    // basically the same? we run through and compare dicts, for any nodes that are new, or removed we add/remove a drawn node
+
+    void GenerateGraph() {
+        Edge<int>[] edges = GraphFactory(3, 3);
+
+        if (graphType == GraphType.Tree) {
+            graph = new TreeGraph<int, Edge<int>>(edges);
+        } else if (graphType == GraphType.RadialTree) {
+            graph = new RadialTreeGraph<int, Edge<int>>(edges);
+        } else if (graphType == GraphType.Force) {
+            graph  = new ForceGraph<int, Edge<int>>(edges);
+        }
+
+        nodeData = graph.GetNodeData();
+    }
+
     void DrawGraph() {
-        Dictionary<int, VisualizableGraph<int, Edge<int>>.NodeData> nodeData = graph.GetNodeData();
         drawnVertices = new Dictionary<int, DrawnVertex>();
 
         // for each defined edge in the graph
@@ -133,22 +154,42 @@ public class GraphVisualizer : MonoBehaviour
             // Draw the source vertex if not already drawn
             if (!drawnVertices.ContainsKey(edge.Source)) {
                 Vector3 position = new Vector3(nodeData[edge.Source].x * widthSpacer, nodeData[edge.Source].y * depthSpacer, 0);
+                position = RotatePointAroundPivot(position, Vector3.zero, new Vector3(0, 0, rotationDegrees));
                 string displayText = nodeData[edge.Source].id.ToString();
-                DrawnVertex newVertex = CreateVertex(position, displayText);
-                drawnVertices.Add(edge.Source, newVertex);
+                DrawnVertex newVertex = CreateVertex(edge.Source, position, displayText);
             }
 
             // Draw the target vertex if not already drawn
+            // TODO - repeated code here from above
             if (!drawnVertices.ContainsKey(edge.Target)) {
                 Vector3 position = new Vector3(nodeData[edge.Target].x * widthSpacer, nodeData[edge.Target].y * depthSpacer, 0);
+                position = RotatePointAroundPivot(position, Vector3.zero, new Vector3(0, 0, rotationDegrees));
                 string displayText = nodeData[edge.Target].id.ToString();
-                DrawnVertex newVertex = CreateVertex(position, displayText);
-                drawnVertices.Add(edge.Target, newVertex);
+                DrawnVertex newVertex = CreateVertex(edge.Target, position, displayText);
             }
 
             // Draw the edge between them
             CreateEdge(drawnVertices[edge.Source], drawnVertices[edge.Target]);
         }
+    }
+
+    // TODO - animate!
+    void UpdateLayout() {
+        GenerateGraph();
+
+        foreach (int id in drawnVertices.Keys) {
+            Vector3 position = new Vector3(nodeData[id].x * widthSpacer, nodeData[id].y * depthSpacer, 0);
+            position = RotatePointAroundPivot(position, Vector3.zero, new Vector3(0, 0, rotationDegrees));
+            drawnVertices[id].vertexObject.SetPosition(position);
+        }
+
+        CenterGraph();
+    }
+
+    Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles) {
+        Vector3 dir = point - pivot;
+        dir = Quaternion.Euler(angles) * dir;
+        return dir + pivot;
     }
 
     // TODO - centering on content rect
@@ -162,12 +203,14 @@ public class GraphVisualizer : MonoBehaviour
         }
     }
 
-    DrawnVertex CreateVertex(Vector3 position, string displayText) {
+    DrawnVertex CreateVertex(int id, Vector3 position, string displayText) {
         VertexObject newVertex = Instantiate(vertexObject, Vector3.zero, Quaternion.identity, parentDisplay);
         newVertex.SetPosition(position);
         newVertex.SetText(displayText);
+        DrawnVertex drawnVertex = new DrawnVertex(newVertex.transform, newVertex);
+        drawnVertices.Add(id, drawnVertex);
 
-        return new DrawnVertex(newVertex.transform, newVertex);
+        return drawnVertex;
     }
 
     DrawnEdge CreateEdge(DrawnVertex start, DrawnVertex end) {
@@ -194,6 +237,12 @@ public class GraphVisualizer : MonoBehaviour
         public DrawnEdge (DrawnVertex _source, DrawnVertex _target) {
             source = _source;
             target = _target;
+        }
+    }
+
+    void OnValidate() {
+        if (Application.isPlaying) {
+            UpdateLayout();
         }
     }
 }

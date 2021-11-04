@@ -824,6 +824,7 @@ MonoBehaviour:
   edgeObject: {fileID: 6535070071568420952, guid: 93832ec8b57bef940bb15d3a53d7c152, type: 3}
   depthSpacer: 100
   widthSpacer: 100
+  rotationDegrees: 0
 --- !u!4 &1206571121
 Transform:
   m_ObjectHideFlags: 0
