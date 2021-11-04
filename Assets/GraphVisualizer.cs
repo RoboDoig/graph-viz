@@ -126,11 +126,11 @@ public class GraphVisualizer : MonoBehaviour
     // Interface for switching layout / shape at run time notes...
     // If we already have a graph and want to change layout...
     // 1. we have existing node data, and generate new node data
-    // 2. we can then match each original node to its new data with the nodeData dict
-    // 3. each node is moved to new position, maybe with some animation
+    // 2. we can then match each original node to its drawn data with the id
+    // 3. each drawn node is moved to new position, maybe with some animation
 
     // If we have new, added or removed graph data
-    // 
+    // basically the same? we run through and compare dicts, for any nodes that are new, or removed we add/remove a drawn node
 
     void GenerateGraph() {
         Edge<int>[] edges = GraphFactory(3, 3);
@@ -173,6 +173,7 @@ public class GraphVisualizer : MonoBehaviour
         }
     }
 
+    // TODO - animate!
     void UpdateLayout() {
         GenerateGraph();
 
