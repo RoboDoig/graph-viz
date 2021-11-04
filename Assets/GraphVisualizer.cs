@@ -14,9 +14,10 @@ public class GraphVisualizer : MonoBehaviour
     public VertexObject vertexObject;
     public EdgeObject edgeObject;
 
-    [Header("Attributs")]
+    [Header("Attributes")]
     public float depthSpacer;
     public float widthSpacer;
+    public float rotationDegrees;
 
     // graph definition
     private VisualizableGraph<int, Edge<int>> graph;
@@ -88,8 +89,8 @@ public class GraphVisualizer : MonoBehaviour
 
         Edge<int>[] edges = GraphFactory(3, 3);
 
-        // graph = new RadialTreeGraph<int, Edge<int>>(edges);              
-        graph = new TreeGraph<int, Edge<int>>(edges);
+        graph = new RadialTreeGraph<int, Edge<int>>(edges);
+        // graph = new TreeGraph<int, Edge<int>>(edges);
         // graph  = new ForceGraph<int, Edge<int>>(edges);
     }
 
@@ -133,14 +134,17 @@ public class GraphVisualizer : MonoBehaviour
             // Draw the source vertex if not already drawn
             if (!drawnVertices.ContainsKey(edge.Source)) {
                 Vector3 position = new Vector3(nodeData[edge.Source].x * widthSpacer, nodeData[edge.Source].y * depthSpacer, 0);
+                position = RotatePointAroundPivot(position, Vector3.zero, new Vector3(0, 0, rotationDegrees));
                 string displayText = nodeData[edge.Source].id.ToString();
                 DrawnVertex newVertex = CreateVertex(position, displayText);
                 drawnVertices.Add(edge.Source, newVertex);
             }
 
             // Draw the target vertex if not already drawn
+            // TODO - repeated code here from above
             if (!drawnVertices.ContainsKey(edge.Target)) {
                 Vector3 position = new Vector3(nodeData[edge.Target].x * widthSpacer, nodeData[edge.Target].y * depthSpacer, 0);
+                position = RotatePointAroundPivot(position, Vector3.zero, new Vector3(0, 0, rotationDegrees));
                 string displayText = nodeData[edge.Target].id.ToString();
                 DrawnVertex newVertex = CreateVertex(position, displayText);
                 drawnVertices.Add(edge.Target, newVertex);
@@ -149,6 +153,12 @@ public class GraphVisualizer : MonoBehaviour
             // Draw the edge between them
             CreateEdge(drawnVertices[edge.Source], drawnVertices[edge.Target]);
         }
+    }
+
+    Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles) {
+        Vector3 dir = point - pivot;
+        dir = Quaternion.Euler(angles) * dir;
+        return dir + pivot;
     }
 
     // TODO - centering on content rect
