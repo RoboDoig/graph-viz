@@ -179,7 +179,9 @@ MonoBehaviour:
   points:
   - {x: 0, y: 0}
   - {x: 0, y: 100}
-  - {x: 0, y: 200}
+  - {x: 100, y: 200}
+  - {x: 100, y: 0}
+  - {x: 300, y: 500}
   thickness: 20
 --- !u!222 &331099953
 CanvasRenderer:
@@ -478,7 +480,9 @@ LineRenderer:
   m_Positions:
   - {x: 200, y: 0, z: 0}
   - {x: 200, y: 100, z: 0}
-  - {x: 200, y: 0, z: 0}
+  - {x: 300, y: 200, z: 0}
+  - {x: 300, y: 0, z: 0}
+  - {x: 500, y: 500, z: 0}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 18.7565
