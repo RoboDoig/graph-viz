@@ -119,24 +119,6 @@ public class UILineRenderer : Graphic
             }
         }
 
-        // Add Triangles
-        // // segment block
-        // vh.AddTriangle(0, 3, 1);
-        // vh.AddTriangle(0, 2, 3);
-
-        // // kink triangles
-        // vh.AddTriangle(3, 2, 4);
-        // vh.AddTriangle(5, 4, 6);
-        // vh.AddTriangle(7, 6, 8);
-
-        // vh.AddTriangle(10, 13, 11);
-        // vh.AddTriangle(10, 12, 13);
-
-        // // kink triangles
-        // vh.AddTriangle(13, 12, 14);
-        // vh.AddTriangle(15, 14, 16);
-        // vh.AddTriangle(17, 16, 18);
-
         // Add triangles
         for (int i = 0; i < points.Count-1; i++) {
             int index = i * (4 + cornerVertices * 2);
