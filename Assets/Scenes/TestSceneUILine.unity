@@ -179,8 +179,11 @@ MonoBehaviour:
   points:
   - {x: 0, y: 0}
   - {x: 0, y: 100}
-  - {x: 0, y: 200}
+  - {x: 100, y: 200}
+  - {x: 0, y: 300}
+  - {x: 400, y: 500}
   thickness: 20
+  cornerVertices: 20
 --- !u!222 &331099953
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -478,7 +481,9 @@ LineRenderer:
   m_Positions:
   - {x: 200, y: 0, z: 0}
   - {x: 200, y: 100, z: 0}
-  - {x: 200, y: 0, z: 0}
+  - {x: 300, y: 200, z: 0}
+  - {x: 200, y: 300, z: 0}
+  - {x: 600, y: 500, z: 0}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 18.7565
@@ -526,8 +531,8 @@ LineRenderer:
       m_Mode: 0
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
-    numCornerVertices: 0
-    numCapVertices: 0
+    numCornerVertices: 10
+    numCapVertices: 37
     alignment: 0
     textureMode: 0
     shadowBias: 0.5
