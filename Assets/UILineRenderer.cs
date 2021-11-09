@@ -98,7 +98,7 @@ public class UILineRenderer : Graphic
                     float lClamp = Mathf.Clamp ( Mathf.Round( (v2-c2).magnitude ), 0, 1);
                     Vector3 rPos = (Quaternion.Euler(0, 0, 180 - kinkAngle) * (c2 - c1) + c2) * rClamp; // If kink is going right away from previous line
                     Vector3 lPos = (Quaternion.Euler(0, 0, 180 - kinkAngle) * (c1 - c2) + c1) * lClamp; // If going left
-                    Vector3 k1 = (rPos + lPos) * rClamp;
+                    Vector3 k1 = rPos + lPos;
                     Vector3 k2 = c2 * rClamp + c1 * lClamp;
 
                     vertex.position = k1; 
@@ -122,33 +122,33 @@ public class UILineRenderer : Graphic
 
         // Add Triangles
         // // segment block
-        // vh.AddTriangle(0, 3, 1);
-        // vh.AddTriangle(0, 2, 3);
+        vh.AddTriangle(0, 3, 1);
+        vh.AddTriangle(0, 2, 3);
 
-        // // kink triangles
-        // vh.AddTriangle(2, 3, 4);
-        // vh.AddTriangle(4, 5, 6);
-        // vh.AddTriangle(6, 7, 8);
+        // kink triangles
+        vh.AddTriangle(3, 2, 4);
+        vh.AddTriangle(5, 4, 6);
+        vh.AddTriangle(7, 6, 8);
 
-        // vh.AddTriangle(10, 13, 11);
-        // vh.AddTriangle(10, 12, 13);
+        vh.AddTriangle(10, 13, 11);
+        vh.AddTriangle(10, 12, 13);
 
-        // // kink triangles
-        // vh.AddTriangle(12, 13, 14);
-        // vh.AddTriangle(14, 15, 16);
-        // vh.AddTriangle(16, 17, 18);
+        // kink triangles
+        vh.AddTriangle(12, 13, 14);
+        vh.AddTriangle(14, 15, 16);
+        vh.AddTriangle(16, 17, 18);
 
         // Add triangles
-        for (int i = 0; i < points.Count-1; i++) {
-            int index = i * (4 + cornerVertices * 2);
-            vh.AddTriangle(index + 0, index + 3, index + 1);
-            vh.AddTriangle(index + 0, index + 2, index + 3);
-            int kStart = index + 2;
-            for (int j = 0; j < cornerVertices; j++) {
-                vh.AddTriangle(kStart, kStart + 1, kStart + 2);
-                kStart = kStart + 2;
-            }
-        }
+        // for (int i = 0; i < points.Count-1; i++) {
+        //     int index = i * (4 + cornerVertices * 2);
+        //     vh.AddTriangle(index + 0, index + 3, index + 1);
+        //     vh.AddTriangle(index + 0, index + 2, index + 3);
+        //     int kStart = index + 2;
+        //     for (int j = 0; j < cornerVertices; j++) {
+        //         vh.AddTriangle(kStart, kStart + 1, kStart + 2);
+        //         kStart = kStart + 2;
+        //     }
+        // }
     }
 
     void DrawVerticesForSegment(Vector2 startPoint, Vector2 endPoint, float angle, VertexHelper vh) {
