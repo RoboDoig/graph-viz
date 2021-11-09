@@ -76,6 +76,7 @@ public class UILineRenderer : Graphic
                 Vector3 adjustVector = Quaternion.Euler(0, 0, -90) * (c2 - c1).normalized * Mathf.Sign(GetAngle(v2, v1));
                 c1 += adjustVector * meetLength;
                 c2 += adjustVector * meetLength;
+                Vector3 cmid = (c2 - c1) / 2f;
 
                 // end of corner positions
                 adjustVector = Quaternion.Euler(0, 0, -90) * (v2 - v1).normalized * Mathf.Sign(GetAngle(v2, v1));
@@ -88,24 +89,23 @@ public class UILineRenderer : Graphic
                 vh.AddVert(vertex);
 
                 // corner lines
+                float kinkAngle = 0f;
+                Debug.Log((v1-c1).magnitude);
+                Debug.Log( Mathf.Clamp ( Mathf.Round( (v1-c1).magnitude ), 0, 1) );
+                for (int x = 1; x <= cornerVertices; x++) {
+                    kinkAngle = (Mathf.DeltaAngle(GetAngle(v2, v1), GetAngle(c2, c1)) / cornerVertices) * x;
+                    float rClamp = Mathf.Clamp ( Mathf.Round( (v1-c1).magnitude ), 0, 1); // These clamps serve as bool multipliers, whether the kinks should angle from c1 or c2
+                    float lClamp = Mathf.Clamp ( Mathf.Round( (v2-c2).magnitude ), 0, 1);
+                    Vector3 rPos = (Quaternion.Euler(0, 0, 180 - kinkAngle) * (c2 - c1) + c2) * rClamp; // If kink is going right away from previous line
+                    Vector3 lPos = (Quaternion.Euler(0, 0, 180 - kinkAngle) * (c1 - c2) + c1) * lClamp; // If going left
+                    Vector3 k1 = (rPos + lPos) * rClamp;
+                    Vector3 k2 = c2 * rClamp + c1 * lClamp;
 
-                // float kinkAngle = (GetAngle(v2, v1) - 180 - GetAngle(c2, c1));
-                float kinkAngle = Mathf.DeltaAngle(GetAngle(v2, v1), GetAngle(c2, c1)) / 4;
-                Vector3 lim1 = Quaternion.Euler(0, 0, 180 - kinkAngle) * (c2 - c1) + c2;
-                Vector3 lim2 = c2;
-
-                vertex.position = lim1; 
-                vh.AddVert(vertex);
-                vertex.position = lim2; 
-                vh.AddVert(vertex);
-
-                Vector3 lim3 = Quaternion.Euler(0, 0, 180 - kinkAngle*2) * (c2 - c1) + c2;
-                Vector3 lim4 = c2;
-
-                vertex.position = lim3; 
-                vh.AddVert(vertex);
-                vertex.position = lim4; 
-                vh.AddVert(vertex);
+                    vertex.position = k1; 
+                    vh.AddVert(vertex);
+                    vertex.position = k2; 
+                    vh.AddVert(vertex);
+                }
             }
 
             // Add vertices
@@ -121,19 +121,34 @@ public class UILineRenderer : Graphic
         }
 
         // Add Triangles
-        vh.AddTriangle(0, 3, 1);
-        vh.AddTriangle(0, 2, 3);
+        // // segment block
+        // vh.AddTriangle(0, 3, 1);
+        // vh.AddTriangle(0, 2, 3);
 
-        vh.AddTriangle(2, 4, 5);
-        vh.AddTriangle(5, 4, 6);
-        vh.AddTriangle(7, 6, 8);
+        // // kink triangles
+        // vh.AddTriangle(2, 3, 4);
+        // vh.AddTriangle(4, 5, 6);
+        // vh.AddTriangle(6, 7, 8);
+
+        // vh.AddTriangle(10, 13, 11);
+        // vh.AddTriangle(10, 12, 13);
+
+        // // kink triangles
+        // vh.AddTriangle(12, 13, 14);
+        // vh.AddTriangle(14, 15, 16);
+        // vh.AddTriangle(16, 17, 18);
 
         // Add triangles
-        // for (int i = 0; i < points.Count-1; i++) {
-        //     int index = i * 2;
-        //     vh.AddTriangle(index + 0, index + 3, index + 1);
-        //     vh.AddTriangle(index + 0, index + 2, index + 3);
-        // }
+        for (int i = 0; i < points.Count-1; i++) {
+            int index = i * (4 + cornerVertices * 2);
+            vh.AddTriangle(index + 0, index + 3, index + 1);
+            vh.AddTriangle(index + 0, index + 2, index + 3);
+            int kStart = index + 2;
+            for (int j = 0; j < cornerVertices; j++) {
+                vh.AddTriangle(kStart, kStart + 1, kStart + 2);
+                kStart = kStart + 2;
+            }
+        }
     }
 
     void DrawVerticesForSegment(Vector2 startPoint, Vector2 endPoint, float angle, VertexHelper vh) {
