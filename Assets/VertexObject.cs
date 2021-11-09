@@ -6,11 +6,13 @@ using UnityEngine.EventSystems;
 
 public class VertexObject : MonoBehaviour, IDragHandler
 {
+    public int renderIndex;
     private RectTransform rectTransform;
     private Text text;
     void Awake() {
         rectTransform = GetComponent<RectTransform>();
         text = GetComponentInChildren<Text>();
+        transform.SetSiblingIndex(renderIndex);
     }
 
     public void SetPosition(Vector3 position) {

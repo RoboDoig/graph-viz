@@ -5,7 +5,16 @@ using UnityEngine.UI;
 
 public class UILineRenderer : Graphic
 {
-    public List<Vector2> points;
+    public Vector2[] points;
+
+    public int positionCount {
+        get {
+            return points.Length;
+        }
+        set {
+            points = new Vector2[value];
+        }
+    }
 
     float width;
     float height;
@@ -15,6 +24,15 @@ public class UILineRenderer : Graphic
     public float thickness = 10f;
     public int cornerVertices = 10;
 
+    public void SetPointPosition(int index, Vector3 position) {
+        points[index] = new Vector2(position.x, position.y);
+        DrawMesh();
+    }
+
+    public void DrawMesh() {
+        SetAllDirty();
+    }
+
     protected override void OnPopulateMesh(VertexHelper vh)
     {
         vh.Clear();
@@ -22,7 +40,7 @@ public class UILineRenderer : Graphic
         width = rectTransform.rect.width;
         height = rectTransform.rect.height;
 
-        if (points.Count < 2) {
+        if (points.Length < 2) {
             return;
         }
 
@@ -32,9 +50,9 @@ public class UILineRenderer : Graphic
         float previousAngle = 0;
 
         // Construct vertices
-        for (int i = 0; i < points.Count; i++) {
+        for (int i = 0; i < points.Length; i++) {
             // Get angle between this point and the next
-            if (i < points.Count - 1) {
+            if (i < points.Length - 1) {
                 angle = GetAngle(points[i], points[i + 1]) - 90f; // Use mathf delta angle instead here?
             }
 
@@ -114,18 +132,18 @@ public class UILineRenderer : Graphic
             vh.AddVert(vertex);
 
             // Previous angle
-            if (i < points.Count - 1) {
+            if (i < points.Length - 1) {
                 previousAngle = angle;
             }
         }
 
         // Add triangles
-        for (int i = 0; i < points.Count-1; i++) {
+        for (int i = 0; i < points.Length-1; i++) {
             int index = i * (4 + cornerVertices * 2);
             vh.AddTriangle(index + 0, index + 3, index + 1);
             vh.AddTriangle(index + 0, index + 2, index + 3);
             int kStart = index + 2;
-            if (i < points.Count - 2) {
+            if (i < points.Length - 2) {
                 for (int j = 0; j < cornerVertices; j++) {
                     vh.AddTriangle(kStart, kStart + 1, kStart + 2);
                     kStart = kStart + 2;

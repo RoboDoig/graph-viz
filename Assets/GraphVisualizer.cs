@@ -215,6 +215,7 @@ public class GraphVisualizer : MonoBehaviour
 
     DrawnEdge CreateEdge(DrawnVertex start, DrawnVertex end) {
         EdgeObject newEdge = Instantiate(edgeObject, Vector3.zero, Quaternion.identity, parentDisplay);
+        newEdge.transform.GetComponent<RectTransform>().anchoredPosition3D = Vector3.zero;
         newEdge.DefinePoints(start.transform, end.transform);
 
         return new DrawnEdge(start, end);
