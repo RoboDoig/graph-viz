@@ -178,12 +178,10 @@ MonoBehaviour:
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   points:
   - {x: 0, y: 0}
-  - {x: 0, y: 100}
-  - {x: 100, y: 100}
-  - {x: 100, y: 300}
-  - {x: 0, y: 300}
+  - {x: 0, y: 200}
+  - {x: 50, y: 0}
   thickness: 20
-  cornerVertices: 5
+  cornerVertices: 10
 --- !u!222 &331099953
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -480,10 +478,8 @@ LineRenderer:
   m_SortingOrder: 0
   m_Positions:
   - {x: 200, y: 0, z: 0}
-  - {x: 200, y: 100, z: 0}
-  - {x: 300, y: 200, z: 0}
-  - {x: 200, y: 300, z: 0}
-  - {x: 600, y: 500, z: 0}
+  - {x: 200, y: 200, z: 0}
+  - {x: 250, y: 0, z: 0}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 18.7565

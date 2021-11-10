@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
+// TODO - since this is button specific, it should inherit from vertexobject and be VertexObjectButton instead
 public class VertexObject : MonoBehaviour, IDragHandler
 {
     public int renderIndex;

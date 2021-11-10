@@ -33,6 +33,14 @@ public class UILineRenderer : Graphic
         SetAllDirty();
     }
 
+    void DrawMeshStraight(VertexHelper vh) {
+
+    }
+
+    void DrawMeshCorners(VertexHelper vh) {
+
+    }
+
     protected override void OnPopulateMesh(VertexHelper vh)
     {
         vh.Clear();
@@ -79,27 +87,43 @@ public class UILineRenderer : Graphic
 
             // If there were previous steps - corner segments
             if (i > 0) {
-                // Kite calculation
-                float adjustAngle = Mathf.DeltaAngle(angle, previousAngle) / 2f;
-                float cornerAngle = 90 - adjustAngle;
-                float oLength = (v1 - new Vector3(points[i].x, points[i].y)).magnitude;
-                float tAngle = Mathf.Tan(cornerAngle*Mathf.Deg2Rad);
-                float meetLength = 0f;
-                if (tAngle != 0) {
-                    meetLength = Mathf.Abs(oLength / tAngle);
+                float adjustAngle = Mathf.DeltaAngle(angle, previousAngle);
+
+                Vector3 c1;
+                Vector3 c2;
+                if (Mathf.Abs(adjustAngle) <= 90f) {
+                    // Kite calculation
+                    float cornerAngle = 90 - adjustAngle / 2f;
+                    float oLength = (v1 - new Vector3(points[i].x, points[i].y)).magnitude;
+                    float tAngle = Mathf.Tan(cornerAngle*Mathf.Deg2Rad);
+                    float meetLength = 0f;
+                    if (tAngle != 0) {
+                        meetLength = Mathf.Abs(oLength / tAngle);
+                    }
+
+                    // start of corner positions
+                    c1 = (Quaternion.Euler(0, 0, previousAngle) * new Vector3(-thickness / 2, 0)) + new Vector3(points[i].x, points[i].y);
+                    c2 = (Quaternion.Euler(0, 0, previousAngle) * new Vector3(thickness / 2, 0)) + new Vector3(points[i].x, points[i].y);
+                    Vector3 adjustVector = Quaternion.Euler(0, 0, -90) * (c2 - c1).normalized;
+                    c1 += adjustVector * meetLength;
+                    c2 += adjustVector * meetLength;
+
+                    // end of corner positions
+                    adjustVector = Quaternion.Euler(0, 0, -90) * (v2 - v1).normalized;
+                    v1 -= adjustVector * meetLength;
+                    v2 -= adjustVector * meetLength;
+                } else {
+                    float cornerAngle = 180 - adjustAngle;
+                    
+                    // start of corner positions
+                    c1 = (Quaternion.Euler(0, 0, previousAngle) * new Vector3(-thickness / 2, 0)) + new Vector3(points[i].x, points[i].y);
+                    c2 = (Quaternion.Euler(0, 0, previousAngle) * new Vector3(thickness / 2, 0)) + new Vector3(points[i].x, points[i].y);
+
+                    // end of corner positions
+                    Vector3 adjustVector = (c2 - c1)/2 + (v1-v2)/2;
+                    v1 += adjustVector * Mathf.Sign(adjustAngle);
+                    v2 += adjustVector * Mathf.Sign(adjustAngle);
                 }
-
-                // start of corner positions
-                Vector3 c1 = (Quaternion.Euler(0, 0, previousAngle) * new Vector3(-thickness / 2, 0)) + new Vector3(points[i].x, points[i].y);
-                Vector3 c2 = (Quaternion.Euler(0, 0, previousAngle) * new Vector3(thickness / 2, 0)) + new Vector3(points[i].x, points[i].y);
-                Vector3 adjustVector = Quaternion.Euler(0, 0, -90) * (c2 - c1).normalized;
-                c1 += adjustVector * meetLength;
-                c2 += adjustVector * meetLength;
-
-                // end of corner positions
-                adjustVector = Quaternion.Euler(0, 0, -90) * (v2 - v1).normalized;
-                v1 -= adjustVector * meetLength;
-                v2 -= adjustVector * meetLength;
 
                 vertex.position = c1; 
                 vh.AddVert(vertex);
@@ -149,27 +173,6 @@ public class UILineRenderer : Graphic
                 }
             }
         }
-    }
-
-    void DrawVerticesForSegment(Vector2 startPoint, Vector2 endPoint, float angle, VertexHelper vh) {
-            UIVertex vertex = UIVertex.simpleVert;
-            vertex.color = color;
-
-            vertex.position = Quaternion.Euler(0, 0, angle) * new Vector3(-thickness / 2, 0);
-            vertex.position += new Vector3(startPoint.x, startPoint.y);
-            vh.AddVert(vertex);
-
-            vertex.position = Quaternion.Euler(0, 0, angle) * new Vector3(-thickness / 2, 1);
-            vertex.position += new Vector3(endPoint.x, endPoint.y);
-            vh.AddVert(vertex);
-
-            vertex.position = Quaternion.Euler(0, 0, angle) * new Vector3(thickness / 2, 1);
-            vertex.position += new Vector3(endPoint.x, endPoint.y);
-            vh.AddVert(vertex);
-
-            vertex.position = Quaternion.Euler(0, 0, angle) * new Vector3(thickness / 2, 0);
-            vertex.position += new Vector3(startPoint.x, startPoint.y);
-            vh.AddVert(vertex);
     }
 
     public float GetAngle(Vector2 me, Vector2 target) {
