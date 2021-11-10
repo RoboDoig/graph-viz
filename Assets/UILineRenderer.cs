@@ -93,9 +93,6 @@ public class UILineRenderer : Graphic
                 Vector3 c1 = (Quaternion.Euler(0, 0, previousAngle) * new Vector3(-thickness / 2, 0)) + new Vector3(points[i].x, points[i].y);
                 Vector3 c2 = (Quaternion.Euler(0, 0, previousAngle) * new Vector3(thickness / 2, 0)) + new Vector3(points[i].x, points[i].y);
                 Vector3 adjustVector = Quaternion.Euler(0, 0, -90) * (c2 - c1).normalized;
-                Debug.Log(GetAngle(v2-v1, c2-c1));
-                Debug.Log(adjustVector);
-                Debug.Log(meetLength);
                 c1 += adjustVector * meetLength;
                 c2 += adjustVector * meetLength;
 

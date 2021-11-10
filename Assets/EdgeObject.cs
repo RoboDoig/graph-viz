@@ -10,6 +10,8 @@ public class EdgeObject : MonoBehaviour
     public Transform end;
     private RectTransform startRect;
     private RectTransform endRect;
+    private Vector3 lastStartPosition;
+    private Vector3 lastEndPosition;
 
     void Awake() {
         lineRenderer = GetComponent<UILineRenderer>();
@@ -34,9 +36,14 @@ public class EdgeObject : MonoBehaviour
 
     // TODO - most of the time edges are static and don't need to update
     private void Update() {
-        DrawStraightLine();
-        // DrawSineWave(1f, 0.5f, 1000);
-        // DrawStepLine();
+        // We only need to draw if target positions changed
+        if (startRect.anchoredPosition3D != lastStartPosition || endRect.anchoredPosition3D != lastEndPosition) {
+            DrawStraightLine();
+            // DrawSineWave(1f, 0.5f, 1000);
+            // DrawStepLine();
+        }
+        lastStartPosition = startRect.anchoredPosition3D;
+        lastEndPosition = endRect.anchoredPosition3D;
     }
 
     private void DrawStraightLine() {
@@ -46,21 +53,25 @@ public class EdgeObject : MonoBehaviour
     }
 
     private void DrawStepLine() {
-        lineRenderer.positionCount = 4;
+        if (start == end) {
+            // If this is a loop back we need to do something different
+        } else {
+            lineRenderer.positionCount = 4;
 
-        Vector3 h = end.position - start.position;
-        Vector3 graphAxis = Vector3.up; // TODO - vector up only accounts for standard rotation
-        float a = Mathf.Deg2Rad * (Vector3.Angle(h, graphAxis));
+            Vector3 h = end.position - start.position;
+            Vector3 graphAxis = Vector3.up; // TODO - vector up only accounts for standard rotation
+            float a = Mathf.Deg2Rad * (Vector3.Angle(h, graphAxis));
 
-        Vector3 b = graphAxis * (h.magnitude * Mathf.Cos(a));
-        Vector3 m = b/2; // m = midpoint straight line
+            Vector3 b = graphAxis * (h.magnitude * Mathf.Cos(a));
+            Vector3 m = b/2; // m = midpoint straight line
 
-        Vector3 crossingLine = h - m;
+            Vector3 crossingLine = h - m;
 
-        lineRenderer.SetPointPosition(0, startRect.anchoredPosition3D);
-        lineRenderer.SetPointPosition(1, m + startRect.anchoredPosition3D);
-        lineRenderer.SetPointPosition(2, crossingLine + startRect.anchoredPosition3D);
-        lineRenderer.SetPointPosition(3, endRect.anchoredPosition3D);
+            lineRenderer.SetPointPosition(0, startRect.anchoredPosition3D);
+            lineRenderer.SetPointPosition(1, m + startRect.anchoredPosition3D);
+            lineRenderer.SetPointPosition(2, crossingLine + startRect.anchoredPosition3D);
+            lineRenderer.SetPointPosition(3, endRect.anchoredPosition3D);
+        }
     }
 
     // https://stackoverflow.com/questions/44692895/sinusoidal-or-other-custom-move-type-between-two-points
