@@ -86,19 +86,21 @@ public class UILineRenderer : Graphic
                 float tAngle = Mathf.Tan(cornerAngle*Mathf.Deg2Rad);
                 float meetLength = 0f;
                 if (tAngle != 0) {
-                    meetLength = oLength / tAngle;
+                    meetLength = Mathf.Abs(oLength / tAngle);
                 }
 
                 // start of corner positions
                 Vector3 c1 = (Quaternion.Euler(0, 0, previousAngle) * new Vector3(-thickness / 2, 0)) + new Vector3(points[i].x, points[i].y);
                 Vector3 c2 = (Quaternion.Euler(0, 0, previousAngle) * new Vector3(thickness / 2, 0)) + new Vector3(points[i].x, points[i].y);
-                Vector3 adjustVector = Quaternion.Euler(0, 0, -90) * (c2 - c1).normalized * Mathf.Sign(GetAngle(v2, v1));
+                Vector3 adjustVector = Quaternion.Euler(0, 0, -90) * (c2 - c1).normalized;
+                Debug.Log(GetAngle(v2-v1, c2-c1));
+                Debug.Log(adjustVector);
+                Debug.Log(meetLength);
                 c1 += adjustVector * meetLength;
                 c2 += adjustVector * meetLength;
-                Vector3 cmid = (c2 - c1) / 2f;
 
                 // end of corner positions
-                adjustVector = Quaternion.Euler(0, 0, -90) * (v2 - v1).normalized * Mathf.Sign(GetAngle(v2, v1));
+                adjustVector = Quaternion.Euler(0, 0, -90) * (v2 - v1).normalized;
                 v1 -= adjustVector * meetLength;
                 v2 -= adjustVector * meetLength;
 
