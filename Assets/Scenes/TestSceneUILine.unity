@@ -179,7 +179,8 @@ MonoBehaviour:
   points:
   - {x: 0, y: 0}
   - {x: 0, y: 200}
-  - {x: 50, y: 0}
+  - {x: -100, y: 291}
+  drawType: 1
   thickness: 20
   cornerVertices: 10
 --- !u!222 &331099953

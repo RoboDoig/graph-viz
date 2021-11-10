@@ -16,6 +16,9 @@ public class UILineRenderer : Graphic
         }
     }
 
+    public enum DrawType {Straight, Corner};
+    public DrawType drawType;
+
     float width;
     float height;
     float unitWidth;
@@ -34,19 +37,7 @@ public class UILineRenderer : Graphic
     }
 
     void DrawMeshStraight(VertexHelper vh) {
-
-    }
-
-    void DrawMeshCorners(VertexHelper vh) {
-
-    }
-
-    protected override void OnPopulateMesh(VertexHelper vh)
-    {
         vh.Clear();
-
-        width = rectTransform.rect.width;
-        height = rectTransform.rect.height;
 
         if (points.Length < 2) {
             return;
@@ -69,21 +60,64 @@ public class UILineRenderer : Graphic
             Vector3 v2 = (Quaternion.Euler(0, 0, angle) * new Vector3(thickness / 2, 0)) + new Vector3(points[i].x, points[i].y);
 
             // If there were previous steps - no corner segments
-            // if (i > 0) {
-            //     // Kite calculation
-            //     float adjustAngle = Mathf.DeltaAngle(angle, previousAngle) / 2f;
-            //     float cornerAngle = 90 - adjustAngle;
-            //     float oLength = (v1 - new Vector3(points[i].x, points[i].y)).magnitude;
-            //     float tAngle = Mathf.Tan(cornerAngle*Mathf.Deg2Rad);
-            //     float meetLength = 0f;
-            //     if (tAngle != 0) {
-            //         meetLength = oLength / tAngle;
-            //     }
-            //     Vector3 adjustVector = Quaternion.Euler(0, 0, -90) * (v2 - v1).normalized;
+            if (i > 0) {
+                // Kite calculation
+                float adjustAngle = Mathf.DeltaAngle(angle, previousAngle) / 2f;
+                float cornerAngle = 90 - adjustAngle;
+                float oLength = (v1 - new Vector3(points[i].x, points[i].y)).magnitude;
+                float tAngle = Mathf.Tan(cornerAngle*Mathf.Deg2Rad);
+                float meetLength = 0f;
+                if (tAngle != 0) {
+                    meetLength = oLength / tAngle;
+                }
+                Vector3 adjustVector = Quaternion.Euler(0, 0, -90) * (v2 - v1).normalized;
 
-            //     v1 += adjustVector * meetLength;
-            //     v2 -= adjustVector * meetLength;
-            // }
+                v1 += adjustVector * meetLength;
+                v2 -= adjustVector * meetLength;
+            }
+
+            // Add vertices
+            vertex.position = v1; 
+            vh.AddVert(vertex);
+            vertex.position = v2; 
+            vh.AddVert(vertex);
+
+            // Previous angle
+            if (i < points.Length - 1) {
+                previousAngle = angle;
+            }
+        }
+
+        // Add triangles
+        for (int i = 0; i < points.Length-1; i++) {
+            int index = i * 2;
+            vh.AddTriangle(index + 0, index + 3, index + 1);
+            vh.AddTriangle(index + 0, index + 2, index + 3);
+        }
+    }
+
+    void DrawMeshCorners(VertexHelper vh) {
+        vh.Clear();
+
+        if (points.Length < 2) {
+            return;
+        }
+
+        float angle = 0;
+        UIVertex vertex = UIVertex.simpleVert;
+        vertex.color = color;
+        float previousAngle = 0;
+
+        // Construct vertices
+        for (int i = 0; i < points.Length; i++) {
+            // Get angle between this point and the next
+            if (i < points.Length - 1) {
+                angle = GetAngle(points[i], points[i + 1]) - 90f; // Use mathf delta angle instead here?
+            }
+
+            // Initial vertex positions
+            Vector3 v1 = (Quaternion.Euler(0, 0, angle) * new Vector3(-thickness / 2, 0)) + new Vector3(points[i].x, points[i].y);
+            Vector3 v2 = (Quaternion.Euler(0, 0, angle) * new Vector3(thickness / 2, 0)) + new Vector3(points[i].x, points[i].y);
 
             // If there were previous steps - corner segments
             if (i > 0) {
@@ -172,6 +206,17 @@ public class UILineRenderer : Graphic
                     kStart = kStart + 2;
                 }
             }
+        }
+    }
+
+    protected override void OnPopulateMesh(VertexHelper vh)
+    {
+        if (drawType == DrawType.Straight) {
+            DrawMeshStraight(vh);
+        } else if (drawType == DrawType.Corner) {
+            DrawMeshCorners(vh);
+        } else {
+            DrawMeshCorners(vh);
         }
     }
 
