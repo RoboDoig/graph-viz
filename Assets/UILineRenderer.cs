@@ -167,22 +167,26 @@ public class UILineRenderer : Graphic
 
                 // corner tri vertices
                 float kinkAngle = 0f;
+                float angleSign = Mathf.Sign(Vector3.SignedAngle((v2-v1), (c2-c1), Vector3.forward));
                 for (int x = 1; x <= cornerVertices; x++) {
                     kinkAngle = (Mathf.DeltaAngle(GetAngle(v2, v1), GetAngle(c2, c1)) / cornerVertices) * x;
-                    float rClamp = Mathf.Clamp ( Mathf.Round( (v1-c1).magnitude ), 0, 1); // These clamps serve as bool multipliers, whether the kinks should angle from c1 or c2
-                    float lClamp = Mathf.Clamp ( Mathf.Round( (v2-c2).magnitude ), 0, 1);
+
+                    // TODO - if kink angles are very small, both v2-v1 and c2-c1 will be close to 0, so both rClamp and lClamp will be 0, k1 and k2 will end up being 0
+                    // These clamps serve as bool multipliers, whether the kinks should angle from c1 or c2
+                    float rClamp;
+                    float lClamp;
+                    if (angleSign >= 0) {
+                        rClamp = 1f;
+                        lClamp = 0f;
+                    } else {
+                        rClamp = 0f;
+                        lClamp = 1f;
+                    }
+
                     Vector3 rPos = (Quaternion.Euler(0, 0, 180 - kinkAngle) * (c2 - c1) + c2) * rClamp; // If kink is going right away from previous line
                     Vector3 lPos = (Quaternion.Euler(0, 0, 180 - kinkAngle) * (c1 - c2) + c1) * lClamp; // If going left
                     Vector3 k1 = rPos + lPos;
                     Vector3 k2 = (c2 * rClamp + c1 * lClamp);
-                    Debug.Log(kinkAngle);
-                    Debug.Log(k1);
-                    Debug.Log(k2);
-
-                    if (kinkAngle == 0) {
-                        k1 = c1;
-                        k2 = c2;
-                    }
 
                     // if (points)
                     vertex.position = k1; 
