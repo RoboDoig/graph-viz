@@ -62,8 +62,8 @@ public class UILineRenderer : Graphic
             // If there were previous steps - no corner segments
             if (i > 0) {
                 // Kite calculation
-                float adjustAngle = Mathf.DeltaAngle(angle, previousAngle) / 2f;
-                float cornerAngle = 90 - adjustAngle;
+                float adjustAngle = Mathf.DeltaAngle(angle, previousAngle);
+                float cornerAngle = 90 - adjustAngle / 2f;
                 float oLength = (v1 - new Vector3(points[i].x, points[i].y)).magnitude;
                 float tAngle = Mathf.Tan(cornerAngle*Mathf.Deg2Rad);
                 float meetLength = 0f;
@@ -107,6 +107,7 @@ public class UILineRenderer : Graphic
         UIVertex vertex = UIVertex.simpleVert;
         vertex.color = color;
         float previousAngle = 0;
+        Vector2 previousPosition = Vector2.zero;
 
         // Construct vertices
         for (int i = 0; i < points.Length; i++) {
@@ -174,7 +175,16 @@ public class UILineRenderer : Graphic
                     Vector3 lPos = (Quaternion.Euler(0, 0, 180 - kinkAngle) * (c1 - c2) + c1) * lClamp; // If going left
                     Vector3 k1 = rPos + lPos;
                     Vector3 k2 = (c2 * rClamp + c1 * lClamp);
+                    Debug.Log(kinkAngle);
+                    Debug.Log(k1);
+                    Debug.Log(k2);
 
+                    if (kinkAngle == 0) {
+                        k1 = c1;
+                        k2 = c2;
+                    }
+
+                    // if (points)
                     vertex.position = k1; 
                     vh.AddVert(vertex);
                     vertex.position = k2; 
@@ -191,6 +201,7 @@ public class UILineRenderer : Graphic
             // Previous angle
             if (i < points.Length - 1) {
                 previousAngle = angle;
+                previousPosition = points[i];
             }
         }
 

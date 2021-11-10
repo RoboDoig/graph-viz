@@ -38,8 +38,8 @@ public class EdgeObject : MonoBehaviour
     private void Update() {
         // We only need to draw if target positions changed
         if (startRect.anchoredPosition3D != lastStartPosition || endRect.anchoredPosition3D != lastEndPosition) {
-            DrawStraightLine();
-            // DrawSineWave(1f, 0.5f, 1000);
+            // DrawStraightLine();
+            DrawSineWave(10f, 0.5f, 1000);
             // DrawStepLine();
         }
         lastStartPosition = startRect.anchoredPosition3D;
@@ -78,7 +78,7 @@ public class EdgeObject : MonoBehaviour
     private void DrawSineWave(float amplitude, float wavelength, int nPoints) {
         lineRenderer.positionCount = nPoints;
         Vector3 p1 = startRect.anchoredPosition3D;
-        Vector3 p2 = startRect.anchoredPosition3D;
+        Vector3 p2 = endRect.anchoredPosition3D;
         Vector3 moveVec = (p2 - p1);
         float dx = p2.x - p1.x;
         float dy = p2.y - p1.y;
@@ -88,6 +88,7 @@ public class EdgeObject : MonoBehaviour
         Vector3 newPosition = new Vector3(0, 0, p1.z);
         for (int i = 0; i < lineRenderer.positionCount; i++) {
             float tx = (float)i / (float)nPoints * distance; // proportion/distance along line
+            Debug.Log(tx);
             
             newPosition.x = p1.x + Mathf.Cos(a) * tx;
             newPosition.y = p1.y + Mathf.Sin(a) * tx;

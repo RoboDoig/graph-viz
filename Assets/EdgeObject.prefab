@@ -59,6 +59,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   renderIndex: 0
+  start: {fileID: 0}
+  end: {fileID: 0}
 --- !u!114 &5283564190780202465
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -76,5 +78,6 @@ MonoBehaviour:
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   points: []
+  drawType: 1
   thickness: 10
   cornerVertices: 10

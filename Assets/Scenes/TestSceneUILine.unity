@@ -179,7 +179,8 @@ MonoBehaviour:
   points:
   - {x: 0, y: 0}
   - {x: 0, y: 200}
-  - {x: -100, y: 291}
+  - {x: 50, y: 200}
+  - {x: 50, y: 200}
   drawType: 1
   thickness: 20
   cornerVertices: 10
@@ -528,7 +529,7 @@ LineRenderer:
       m_Mode: 0
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
-    numCornerVertices: 10
+    numCornerVertices: 0
     numCapVertices: 37
     alignment: 0
     textureMode: 0
