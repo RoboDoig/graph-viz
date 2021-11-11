@@ -171,7 +171,6 @@ public class UILineRenderer : Graphic
                 for (int x = 1; x <= cornerVertices; x++) {
                     kinkAngle = (Mathf.DeltaAngle(GetAngle(v2, v1), GetAngle(c2, c1)) / cornerVertices) * x;
 
-                    // TODO - if kink angles are very small, both v2-v1 and c2-c1 will be close to 0, so both rClamp and lClamp will be 0, k1 and k2 will end up being 0
                     // These clamps serve as bool multipliers, whether the kinks should angle from c1 or c2
                     float rClamp;
                     float lClamp;

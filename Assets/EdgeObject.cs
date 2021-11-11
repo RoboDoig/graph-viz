@@ -39,8 +39,8 @@ public class EdgeObject : MonoBehaviour
         // We only need to draw if target positions changed
         if (startRect.anchoredPosition3D != lastStartPosition || endRect.anchoredPosition3D != lastEndPosition) {
             // DrawStraightLine();
-            DrawSineWave(10f, 0.5f, 100);
-            // DrawStepLine();
+            // DrawSineWave(10f, 0.5f, 100);
+            DrawStepLine();
         }
         lastStartPosition = startRect.anchoredPosition3D;
         lastEndPosition = endRect.anchoredPosition3D;

@@ -79,5 +79,5 @@ MonoBehaviour:
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   points: []
   drawType: 1
-  thickness: 10
+  thickness: 5
   cornerVertices: 10
